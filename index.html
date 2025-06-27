@@ -5,178 +5,180 @@
   <title>Abgas, Stau & Lärm Wiesbadener Straße</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #2978b5;
-      color: #fff;
-      padding: 2rem;
-      text-align: center;
-    }
-    main {
-      max-width: 700px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    footer {
-      text-align: center;
-      color: #888;
-      margin: 2rem 0;
-    }
-    nav a {
-      color: #fff;
-      margin: 0 1rem;
-      text-decoration: underline;
-    }
-    .statistik {
-      background: #e5f1fa;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 1px 4px rgba(41,120,181,0.07);
-    }
-    .statistik h2 {
-      margin-top: 0;
-      color: #2978b5;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #bcd;
-      padding: 6px 10px;
-      text-align: left;
-    }
-    th {
-      background: #c7e0f8;
-    }
-    tr:nth-child(even) {
-      background: #f5faff;
-    }
-    .upload-box {
-      margin-bottom: 1.5em;
-      background: #fff;
-      padding: 1em;
-      border-radius: 8px;
-      border: 1px dashed #2978b5;
-      text-align: center;
-    }
-    .upload-box input[type="file"] {
-      margin: 0.5em 0;
-    }
+    body { font-family: Arial, sans-serif; background: #f9f9f9; color: #222; margin: 0; padding: 0; }
+    header { background: #2978b5; color: #fff; padding: 2rem; text-align: center; }
+    main { max-width: 700px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+    .statistik { background: #e5f1fa; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 4px rgba(41,120,181,0.07);}
+    .statistik h2 { margin-top: 0; color: #2978b5;}
+    #controls { margin-bottom: 1.5em; }
+    label { margin-right: 0.5em; }
+    input, select { margin-right: 1em; }
+    #pegel-chart-box { margin: 1.5em 0; background: #fff; border-radius: 8px; padding: 1em; box-shadow: 0 1px 4px rgba(41,120,181,0.07);}
+    canvas { max-width: 100%; height: 350px !important;}
+    .info { font-size: 0.95em; color: #2978b5;}
+    .loading { color: #ea7e23; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
     <h1>Abgas, Stau & Lärm – Wiesbadener Straße</h1>
-    <nav>
-      <a href="#">Start</a>
-      <a href="#">Über uns</a>
-      <a href="#">Kontakt</a>
-    </nav>
   </header>
   <main>
     <section class="statistik">
-      <h2>Lärmpegel-Statistik (TXT-Datei hochladen)</h2>
-      <div class="upload-box">
-        <label for="pegel-upload"><strong>Lärmpegel-Datei auswählen (.txt):</strong></label><br>
-        <input type="file" id="pegel-upload" accept=".txt">
+      <h2>Lärmpegel – interaktive Auswertung</h2>
+      <div id="controls">
+        <label>Schnellwahl:</label>
+        <select id="quick-range">
+          <option value="">– Zeitraum wählen –</option>
+          <option value="10">Letzte 10 Minuten</option>
+          <option value="20">Letzte 20 Minuten</option>
+          <option value="30">Letzte 30 Minuten</option>
+          <option value="60">Letzte 1 Stunde</option>
+          <option value="720">Letzte 12 Stunden</option>
+          <option value="1440">Letzte 24 Stunden</option>
+        </select>
+        <label>ODER von:</label>
+        <input type="datetime-local" id="from-time">
+        <label>bis:</label>
+        <input type="datetime-local" id="to-time">
+        <button id="custom-range-btn">Anzeigen</button>
       </div>
-      <table id="pegel-tabelle" style="display:none;">
-        <thead>
-          <tr><th>Datum & Uhrzeit</th><th>Maximaler Pegel (dB)</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div id="pegel-info"></div>
-    </section>
-    <section class="statistik">
-      <h2>Verkehrszählung (TXT-Datei hochladen)</h2>
-      <div class="upload-box">
-        <label for="verkehr-upload"><strong>Verkehrszählung-Datei auswählen (.txt):</strong></label><br>
-        <input type="file" id="verkehr-upload" accept=".txt">
+      <div class="info" id="pegel-info"></div>
+      <div id="pegel-chart-box" style="display:none;">
+        <canvas id="pegel-chart"></canvas>
       </div>
-      <table id="verkehr-tabelle" style="display:none;">
-        <thead>
-          <tr><th>Datum & Uhrzeit</th><th>Fahrzeugtyp</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div id="verkehr-info"></div>
+      <div class="loading" id="loader" style="display:none;">Lade Messdaten...</div>
     </section>
     <h2>Willkommen!</h2>
     <p>
-      Diese Seite informiert über die Themen <strong>Abgas, Stau und Lärmbelastung</strong> auf der Wiesbadener Straße.
-    </p>
-    <p>
-      Du kannst täglich eine neue Statistikdatei hochladen und die Werte werden automatisch angezeigt.
+      Die Messwerte werden automatisch geladen. Wähle einen Zeitraum aus, um die Werte als Diagramm zu sehen.
     </p>
   </main>
   <footer>
     &copy; 2025 Ozi-ui
   </footer>
   <script>
-    // Lärmpegel-Statistik hochladen & anzeigen
-    document.getElementById('pegel-upload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const lines = evt.target.result.split(/\r?\n/).filter(Boolean);
-        const tbody = document.querySelector('#pegel-tabelle tbody');
-        tbody.innerHTML = '';
-        let count = 0;
-        lines.forEach(line => {
-          // Format: 2025-06-18 21:20:00 - Maximaler Pegel: 55.13 dB
-          const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([\d.]+) dB/);
-          if (match) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${match[1]}</td><td>${match[2]}</td>`;
-            tbody.appendChild(tr);
-            count++;
+    // === KONFIGURATION: URL zur Pegeldatei anpassen! ===
+    const PEGEL_URL = 'https://Ozi-ui.github.io/abgas-stau-laerm-wiesbadenerstr/daten/pegel.txt';
+
+    let pegelDaten = []; // {ts: Date, value: Number}
+    let pegelChart = null;
+    let isLoaded = false;
+
+    function parsePegelZeile(line) {
+      // 2025-06-18 21:20:00 - Maximaler Pegel: 55.13 dB
+      const m = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([\d.]+) dB/);
+      if (m) {
+        return {ts: new Date(m[1].replace(' ', 'T')), value: parseFloat(m[2])};
+      }
+      return null;
+    }
+
+    function filterDaten(from, to) {
+      return pegelDaten.filter(d => d.ts >= from && d.ts <= to);
+    }
+
+    function updateChart(daten) {
+      if (pegelChart) pegelChart.destroy();
+      if (daten.length === 0) {
+        document.getElementById('pegel-chart-box').style.display = 'none';
+        document.getElementById('pegel-info').textContent = 'Keine Messungen im gewählten Zeitraum!';
+        return;
+      }
+      const labels = daten.map(d => d.ts.toLocaleString('de-DE'));
+      const values = daten.map(d => d.value);
+      document.getElementById('pegel-chart-box').style.display = '';
+      pegelChart = new Chart(document.getElementById('pegel-chart').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Maximaler Pegel (dB)',
+            data: values,
+            fill: false,
+            borderColor: '#2978b5',
+            backgroundColor: '#2978b5',
+            tension: 0.1,
+            pointRadius: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true }
+          },
+          scales: {
+            x: { title: {display: true, text: 'Zeit'}, ticks: {maxTicksLimit: 10, autoSkip: true}},
+            y: { title: {display: true, text: 'dB'}}
           }
-        });
-        document.getElementById('pegel-tabelle').style.display = count > 0 ? '' : 'none';
-        document.getElementById('pegel-info').textContent = count > 0 ? `Anzahl Messungen: ${count}` : 'Keine gültigen Messwerte gefunden.';
-      };
-      reader.readAsText(file, "UTF-8");
+        }
+      });
+      document.getElementById('pegel-info').textContent = `Messungen: ${daten.length} | Von: ${labels[0]} bis ${labels[labels.length-1]}`;
+    }
+
+    function showLoader(visible) {
+      document.getElementById('loader').style.display = visible ? '' : 'none';
+    }
+
+    // Daten laden
+    async function ladePegelDaten() {
+      showLoader(true);
+      try {
+        const resp = await fetch(PEGEL_URL + '?cachebust=' + Date.now());
+        if (!resp.ok) throw new Error('Fehler beim Laden');
+        const txt = await resp.text();
+        pegelDaten = txt.split(/\r?\n/).map(parsePegelZeile).filter(Boolean);
+        isLoaded = true;
+        showLoader(false);
+        if (pegelDaten.length > 0) {
+          // Standard: letzte Stunde
+          zeigeLetzteXMinuten(60);
+        } else {
+          document.getElementById('pegel-info').textContent = 'Keine Daten gefunden!';
+        }
+      } catch(e) {
+        showLoader(false);
+        document.getElementById('pegel-info').textContent = 'Fehler beim Laden der Datei!';
+      }
+    }
+
+    // Schnellwahl
+    function zeigeLetzteXMinuten(minuten) {
+      if (!isLoaded) return;
+      const to = new Date();
+      const from = new Date(to.getTime() - minuten*60*1000);
+      const daten = filterDaten(from, to);
+      updateChart(daten);
+    }
+
+    // Von/bis Auswahl
+    function zeigeVonBis() {
+      if (!isLoaded) return;
+      const fromVal = document.getElementById('from-time').value;
+      const toVal = document.getElementById('to-time').value;
+      if (!fromVal || !toVal) return;
+      const from = new Date(fromVal);
+      const to = new Date(toVal);
+      if (from >= to) {
+        document.getElementById('pegel-info').textContent = 'Startzeit muss vor Endzeit liegen!';
+        return;
+      }
+      const daten = filterDaten(from, to);
+      updateChart(daten);
+    }
+
+    // Event Listener
+    document.getElementById('quick-range').addEventListener('change', function() {
+      const val = this.value;
+      if (val) zeigeLetzteXMinuten(parseInt(val,10));
+    });
+    document.getElementById('custom-range-btn').addEventListener('click', function() {
+      zeigeVonBis();
     });
 
-    // Verkehrszählung-Statistik hochladen & anzeigen
-    document.getElementById('verkehr-upload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const lines = evt.target.result.split(/\r?\n/).filter(Boolean);
-        const tbody = document.querySelector('#verkehr-tabelle tbody');
-        tbody.innerHTML = '';
-        let count = 0;
-        lines.forEach(line => {
-          // Format: 2025-06-18, 11:40:49, Auto
-          const match = line.match(/^(\d{4}-\d{2}-\d{2}),\s*([\d:]+),\s*(\w+)/);
-          if (match) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${match[1]} ${match[2]}</td><td>${match[3]}</td>`;
-            tbody.appendChild(tr);
-            count++;
-          }
-        });
-        document.getElementById('verkehr-tabelle').style.display = count > 0 ? '' : 'none';
-        document.getElementById('verkehr-info').textContent = count > 0 ? `Anzahl Fahrzeuge: ${count}` : 'Keine gültigen Einträge gefunden.';
-      };
-      reader.readAsText(file, "UTF-8");
-    });
+    // Initial laden
+    ladePegelDaten();
   </script>
 </body>
 </html>
