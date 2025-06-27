@@ -63,6 +63,17 @@
     tr:nth-child(even) {
       background: #f5faff;
     }
+    .upload-box {
+      margin-bottom: 1.5em;
+      background: #fff;
+      padding: 1em;
+      border-radius: 8px;
+      border: 1px dashed #2978b5;
+      text-align: center;
+    }
+    .upload-box input[type="file"] {
+      margin: 0.5em 0;
+    }
   </style>
 </head>
 <body>
@@ -76,94 +87,96 @@
   </header>
   <main>
     <section class="statistik">
-      <h2>Lärm-Messwerte (Beispiel)</h2>
-      <table>
+      <h2>Lärmpegel-Statistik (TXT-Datei hochladen)</h2>
+      <div class="upload-box">
+        <label for="pegel-upload"><strong>Lärmpegel-Datei auswählen (.txt):</strong></label><br>
+        <input type="file" id="pegel-upload" accept=".txt">
+      </div>
+      <table id="pegel-tabelle" style="display:none;">
         <thead>
-          <tr>
-            <th>Datum & Uhrzeit</th>
-            <th>Maximaler Pegel (dB)</th>
-          </tr>
+          <tr><th>Datum & Uhrzeit</th><th>Maximaler Pegel (dB)</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>2025-06-18 21:20:00</td>
-            <td>55.13</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:02</td>
-            <td>51.57</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:03</td>
-            <td>48.86</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:04</td>
-            <td>46.97</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:06</td>
-            <td>46.71</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:07</td>
-            <td>45.45</td>
-          </tr>
-          <tr>
-            <td>2025-06-18 21:20:08</td>
-            <td>48.04</td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
-      <p style="font-size:0.95em; color:#2978b5; margin-top:0.5em;">
-        Die Werte werden regelmäßig aktualisiert. <br>
-        <em>Letzte Messung: 2025-06-18</em>
-      </p>
+      <div id="pegel-info"></div>
     </section>
     <section class="statistik">
-      <h2>Verkehrszählung (Beispiel)</h2>
-      <table>
+      <h2>Verkehrszählung (TXT-Datei hochladen)</h2>
+      <div class="upload-box">
+        <label for="verkehr-upload"><strong>Verkehrszählung-Datei auswählen (.txt):</strong></label><br>
+        <input type="file" id="verkehr-upload" accept=".txt">
+      </div>
+      <table id="verkehr-tabelle" style="display:none;">
         <thead>
-          <tr>
-            <th>Datum & Uhrzeit</th>
-            <th>Fahrzeugtyp</th>
-          </tr>
+          <tr><th>Datum & Uhrzeit</th><th>Fahrzeugtyp</th></tr>
         </thead>
-        <tbody>
-          <tr><td>2025-06-18, 11:40:49</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:40:52</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:40:58</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:40:59</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:01</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:02</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:22</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:24</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:26</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:30</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:31</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:40</td><td>Auto</td></tr>
-          <tr><td>2025-06-18, 11:41:43</td><td>LKW</td></tr>
-          <tr><td>2025-06-18, 11:41:44</td><td>Auto</td></tr>
-        </tbody>
+        <tbody></tbody>
       </table>
-      <p style="font-size:0.95em; color:#2978b5; margin-top:0.5em;">
-        Beispielhafte Verkehrszählung.<br>
-        <em>Weitere Auswertungen folgen.</em>
-      </p>
+      <div id="verkehr-info"></div>
     </section>
     <h2>Willkommen!</h2>
     <p>
       Diese Seite informiert über die Themen <strong>Abgas, Stau und Lärmbelastung</strong> auf der Wiesbadener Straße.
     </p>
     <p>
-      Du kannst diesen Text später ganz einfach anpassen und weitere Inhalte, Bilder oder Statistiken hinzufügen.
-    </p>
-    <p>
-      Viel Spaß beim Gestalten deiner Webseite!
+      Du kannst täglich eine neue Statistikdatei hochladen und die Werte werden automatisch angezeigt.
     </p>
   </main>
   <footer>
     &copy; 2025 Ozi-ui
   </footer>
+  <script>
+    // Lärmpegel-Statistik hochladen & anzeigen
+    document.getElementById('pegel-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const lines = evt.target.result.split(/\r?\n/).filter(Boolean);
+        const tbody = document.querySelector('#pegel-tabelle tbody');
+        tbody.innerHTML = '';
+        let count = 0;
+        lines.forEach(line => {
+          // Format: 2025-06-18 21:20:00 - Maximaler Pegel: 55.13 dB
+          const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([\d.]+) dB/);
+          if (match) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${match[1]}</td><td>${match[2]}</td>`;
+            tbody.appendChild(tr);
+            count++;
+          }
+        });
+        document.getElementById('pegel-tabelle').style.display = count > 0 ? '' : 'none';
+        document.getElementById('pegel-info').textContent = count > 0 ? `Anzahl Messungen: ${count}` : 'Keine gültigen Messwerte gefunden.';
+      };
+      reader.readAsText(file, "UTF-8");
+    });
+
+    // Verkehrszählung-Statistik hochladen & anzeigen
+    document.getElementById('verkehr-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const lines = evt.target.result.split(/\r?\n/).filter(Boolean);
+        const tbody = document.querySelector('#verkehr-tabelle tbody');
+        tbody.innerHTML = '';
+        let count = 0;
+        lines.forEach(line => {
+          // Format: 2025-06-18, 11:40:49, Auto
+          const match = line.match(/^(\d{4}-\d{2}-\d{2}),\s*([\d:]+),\s*(\w+)/);
+          if (match) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${match[1]} ${match[2]}</td><td>${match[3]}</td>`;
+            tbody.appendChild(tr);
+            count++;
+          }
+        });
+        document.getElementById('verkehr-tabelle').style.display = count > 0 ? '' : 'none';
+        document.getElementById('verkehr-info').textContent = count > 0 ? `Anzahl Fahrzeuge: ${count}` : 'Keine gültigen Einträge gefunden.';
+      };
+      reader.readAsText(file, "UTF-8");
+    });
+  </script>
 </body>
 </html>
