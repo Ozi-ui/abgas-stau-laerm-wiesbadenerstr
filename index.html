@@ -1,184 +1,78 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Abgas, Stau & Lärm Wiesbadener Straße</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; color: #222; margin: 0; padding: 0; }
-    header { background: #2978b5; color: #fff; padding: 2rem; text-align: center; }
-    main { max-width: 700px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
-    .statistik { background: #e5f1fa; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; box-shadow: 0 1px 4px rgba(41,120,181,0.07);}
-    .statistik h2 { margin-top: 0; color: #2978b5;}
-    #controls { margin-bottom: 1.5em; }
-    label { margin-right: 0.5em; }
-    input, select { margin-right: 1em; }
-    #pegel-chart-box { margin: 1.5em 0; background: #fff; border-radius: 8px; padding: 1em; box-shadow: 0 1px 4px rgba(41,120,181,0.07);}
-    canvas { max-width: 100%; height: 350px !important;}
-    .info { font-size: 0.95em; color: #2978b5;}
-    .loading { color: #ea7e23; }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <title>Fahrzeuganalyse</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Abgas, Stau & Lärm – Wiesbadener Straße</h1>
-  </header>
-  <main>
-    <section class="statistik">
-      <h2>Lärmpegel – interaktive Auswertung</h2>
-      <div id="controls">
-        <label>Schnellwahl:</label>
-        <select id="quick-range">
-          <option value="">– Zeitraum wählen –</option>
-          <option value="10">Letzte 10 Minuten</option>
-          <option value="20">Letzte 20 Minuten</option>
-          <option value="30">Letzte 30 Minuten</option>
-          <option value="60">Letzte 1 Stunde</option>
-          <option value="720">Letzte 12 Stunden</option>
-          <option value="1440">Letzte 24 Stunden</option>
-        </select>
-        <label>ODER von:</label>
-        <input type="datetime-local" id="from-time">
-        <label>bis:</label>
-        <input type="datetime-local" id="to-time">
-        <button id="custom-range-btn">Anzeigen</button>
-      </div>
-      <div class="info" id="pegel-info"></div>
-      <div id="pegel-chart-box" style="display:none;">
-        <canvas id="pegel-chart"></canvas>
-      </div>
-      <div class="loading" id="loader" style="display:none;">Lade Messdaten...</div>
-    </section>
-    <h2>Willkommen!</h2>
-    <p>
-      Die Messwerte werden automatisch geladen. Wähle einen Zeitraum aus, um die Werte als Diagramm zu sehen.
-    </p>
-  </main>
-  <footer>
-    &copy; 2025 Ozi-ui
-  </footer>
-  <script>
-    // === KONFIGURATION: URL zur Pegeldatei anpassen! ===
-    const PEGEL_URL = 'https://Ozi-ui.github.io/abgas-stau-laerm-wiesbadenerstr/daten/pegel.txt';
+    <h1>Fahrzeugaufkommen (interaktiv)</h1>
+    <div id="plot"></div>
+    <script>
+    fetch('Daten/vehicle_counts.txt')
+      .then(response => response.text())
+      .then(text => {
+        const lines = text.split('\n').filter(l => l.trim() !== '');
 
-    let pegelDaten = []; // {ts: Date, value: Number}
-    let pegelChart = null;
-    let isLoaded = false;
-
-    function parsePegelZeile(line) {
-      // 2025-06-18 21:20:00 - Maximaler Pegel: 55.13 dB
-      const m = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([\d.]+) dB/);
-      if (m) {
-        return {ts: new Date(m[1].replace(' ', 'T')), value: parseFloat(m[2])};
-      }
-      return null;
-    }
-
-    function filterDaten(from, to) {
-      return pegelDaten.filter(d => d.ts >= from && d.ts <= to);
-    }
-
-    function updateChart(daten) {
-      if (pegelChart) pegelChart.destroy();
-      if (daten.length === 0) {
-        document.getElementById('pegel-chart-box').style.display = 'none';
-        document.getElementById('pegel-info').textContent = 'Keine Messungen im gewählten Zeitraum!';
-        return;
-      }
-      const labels = daten.map(d => d.ts.toLocaleString('de-DE'));
-      const values = daten.map(d => d.value);
-      document.getElementById('pegel-chart-box').style.display = '';
-      pegelChart = new Chart(document.getElementById('pegel-chart').getContext('2d'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Maximaler Pegel (dB)',
-            data: values,
-            fill: false,
-            borderColor: '#2978b5',
-            backgroundColor: '#2978b5',
-            tension: 0.1,
-            pointRadius: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: true }
-          },
-          scales: {
-            x: { title: {display: true, text: 'Zeit'}, ticks: {maxTicksLimit: 10, autoSkip: true}},
-            y: { title: {display: true, text: 'dB'}}
+        // Daten sammeln
+        const timestamps = [];
+        const types = [];
+        lines.forEach(line => {
+          const parts = line.split(',');
+          if(parts.length === 3) {
+            const ts = parts[0].trim() + ' ' + parts[1].trim();
+            timestamps.push(ts);
+            types.push(parts[2].trim());
           }
-        }
+        });
+
+        // Fahrzeugtypen zählen je Zeitstempel
+        const uniqueTypes = [...new Set(types)];
+        const dataPerType = {};
+        uniqueTypes.forEach(type => dataPerType[type] = {x: [], y: []});
+
+        timestamps.forEach((ts, idx) => {
+          const type = types[idx];
+          dataPerType[type].x.push(ts);
+          dataPerType[type].y.push(1); // Einzelne Zählung
+        });
+
+        // Summen pro Typ für Balkendiagramm
+        const counts = uniqueTypes.map(type => types.filter(t => t === type).length);
+
+        // Zeitverlauf Liniendiagramm je Typ
+        const traces = uniqueTypes.map(type => ({
+          x: dataPerType[type].x,
+          y: dataPerType[type].y.map((v,i)=>i+1), // kumulativ für schöne Linien
+          mode: 'lines+markers',
+          name: type
+        }));
+
+        // Balkendiagramm
+        traces.push({
+          x: uniqueTypes,
+          y: counts,
+          type: 'bar',
+          name: 'Summe',
+          marker: {opacity:0.5, color:'gray'},
+          yaxis: 'y2'
+        });
+
+        const layout = {
+          title: 'Fahrzeugaufkommen nach Typ und Zeit',
+          xaxis: {title: 'Zeit / Typ'},
+          yaxis: {title: 'Kumulative Anzahl'},
+          yaxis2: {
+            title: 'Gesamtsumme',
+            overlaying: 'y',
+            side: 'right',
+            showgrid: false
+          },
+          legend: {x:1.05, y:1}
+        };
+
+        Plotly.newPlot('plot', traces, layout);
       });
-      document.getElementById('pegel-info').textContent = `Messungen: ${daten.length} | Von: ${labels[0]} bis ${labels[labels.length-1]}`;
-    }
-
-    function showLoader(visible) {
-      document.getElementById('loader').style.display = visible ? '' : 'none';
-    }
-
-    // Daten laden
-    async function ladePegelDaten() {
-      showLoader(true);
-      try {
-        const resp = await fetch(PEGEL_URL + '?cachebust=' + Date.now());
-        if (!resp.ok) throw new Error('Fehler beim Laden');
-        const txt = await resp.text();
-        pegelDaten = txt.split(/\r?\n/).map(parsePegelZeile).filter(Boolean);
-        isLoaded = true;
-        showLoader(false);
-        if (pegelDaten.length > 0) {
-          // Standard: letzte Stunde
-          zeigeLetzteXMinuten(60);
-        } else {
-          document.getElementById('pegel-info').textContent = 'Keine Daten gefunden!';
-        }
-      } catch(e) {
-        showLoader(false);
-        document.getElementById('pegel-info').textContent = 'Fehler beim Laden der Datei!';
-      }
-    }
-
-    // Schnellwahl
-    function zeigeLetzteXMinuten(minuten) {
-      if (!isLoaded) return;
-      const to = new Date();
-      const from = new Date(to.getTime() - minuten*60*1000);
-      const daten = filterDaten(from, to);
-      updateChart(daten);
-    }
-
-    // Von/bis Auswahl
-    function zeigeVonBis() {
-      if (!isLoaded) return;
-      const fromVal = document.getElementById('from-time').value;
-      const toVal = document.getElementById('to-time').value;
-      if (!fromVal || !toVal) return;
-      const from = new Date(fromVal);
-      const to = new Date(toVal);
-      if (from >= to) {
-        document.getElementById('pegel-info').textContent = 'Startzeit muss vor Endzeit liegen!';
-        return;
-      }
-      const daten = filterDaten(from, to);
-      updateChart(daten);
-    }
-
-    // Event Listener
-    document.getElementById('quick-range').addEventListener('change', function() {
-      const val = this.value;
-      if (val) zeigeLetzteXMinuten(parseInt(val,10));
-    });
-    document.getElementById('custom-range-btn').addEventListener('click', function() {
-      zeigeVonBis();
-    });
-
-    // Initial laden
-    ladePegelDaten();
-  </script>
+    </script>
 </body>
 </html>
