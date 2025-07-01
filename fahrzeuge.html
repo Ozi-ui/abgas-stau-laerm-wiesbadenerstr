@@ -33,6 +33,32 @@
 </div>
 
 <script>
+// Plugin für farbige Hintergrundbereiche im Linien-Chart
+const backgroundRangesPlugin = {
+    id: 'backgroundRanges',
+    beforeDatasetsDraw: (chart) => {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea || !scales.y) return;
+        // Beispielbereiche für Fahrzeugdichte (anpassbar!)
+        // [unten, oben, Farbe, Opazität]
+        const ranges = [
+            [0, 5, 'green', 0.12],
+            [5, 10, 'yellow', 0.13],
+            [10, 20, 'orange', 0.13],
+            [20, 100, 'red', 0.11]
+        ];
+        ranges.forEach(([yMin, yMax, color, alpha]) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            const y0 = scales.y.getPixelForValue(yMax);
+            const y1 = scales.y.getPixelForValue(yMin);
+            ctx.fillRect(chartArea.left, y0, chartArea.right - chartArea.left, y1 - y0);
+            ctx.restore();
+        });
+    }
+};
+
 const farben = {
     'Auto': 'steelblue',
     'Bus': 'orange',
@@ -181,7 +207,8 @@ function updateLinienDiagramm() {
             scales: {
                 y: {beginAtZero:true, title:{display:true, text:'Anzahl'}}
             }
-        }
+        },
+        plugins: [backgroundRangesPlugin]
     });
 }
 
