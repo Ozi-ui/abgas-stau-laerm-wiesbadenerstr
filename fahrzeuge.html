@@ -5,35 +5,102 @@
     <title>Fahrzeugzählung</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
-        h2 { margin-top: 40px; }
-        #container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; }
+        #sidebar {
+            width: 210px;
+            float: left;
+            background: #333;
+            color: #fff;
+            height: 100vh;
+            padding: 20px 0;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 2px 0 8px #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        #sidebar ul {
+            list-style: none;
+            padding: 0 0 0 20px;
+        }
+        #sidebar ul li {
+            margin: 18px 0;
+        }
+        #sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 18px;
+            display: block;
+            border-radius: 4px;
+            font-size: 1.07em;
+        }
+        #sidebar ul li a:hover,
+        #sidebar ul li a.active {
+            background: #444;
+        }
+        #container {
+            max-width: 900px;
+            margin: 40px auto 40px 240px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px #ccc;
+            min-height: 100vh;
+        }
         h1 { margin-bottom: 30px; }
-        .chart-block { margin-bottom: 50px; }
-        canvas { height: 400px !important; width: 100% !important; }
+        h2 { margin-top: 40px; }
+        .chart-block { margin-bottom: 60px; }
+        canvas { height: 410px !important; width: 100% !important; }
+        #fahrzeug-linie-auto { margin-bottom: 60px !important; }
         .input-group { margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .input-group label { white-space: nowrap; }
         .input-group input[type="datetime-local"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .input-group button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .input-group button:hover { background-color: #0056b3; }
         #gesamtanzahl { margin: 0 0 20px 0; font-weight: bold; font-size: 1.2em; }
         .hinweis { color: #555; margin: 10px 0 0 0; font-size: 0.97em; }
         .filter-block { margin-bottom: 20px; }
+        .pulldown {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .pulldown:focus, .pulldown:hover {
+            background-color: #0056b3;
+        }
+        @media (max-width: 900px) {
+            #container { margin-left: 0; max-width: 98vw; }
+            #sidebar { position: static; width: 100%; border-radius: 0; height: auto; box-shadow: none; }
+        }
         @media (max-width: 600px) {
             #container { padding: 8px; }
-            canvas { height: 250px !important; }
+            canvas { height: 260px !important; }
             .input-group { flex-direction: column; align-items: flex-start; gap: 5px; }
         }
     </style>
 </head>
 <body>
+<div id="sidebar">
+    <nav>
+        <ul>
+            <li><a href="index.html">Startseite</a></li>
+            <li><a href="fahrzeuge.html" class="active">Fahrzeugzählung</a></li>
+            <li><a href="stau.html">Stau</a></li>
+            <li><a href="laerm.html">Lärm</a></li>
+            <!-- weitere Links -->
+        </ul>
+    </nav>
+</div>
 <div id="container">
     <h1>Fahrzeugzählung</h1>
     <div class="chart-block">
         <h2 id="balken-chart-title">Fahrzeugaufkommen nach Typ (Filterbar)</h2>
         <div class="filter-block">
             Zeitraum:
-            <select id="balken-zeitraum-preset">
+            <select id="balken-zeitraum-preset" class="pulldown">
                 <option value="last10min">Letzte 10 Minuten</option>
                 <option value="last30min">Letzte 30 Minuten</option>
                 <option value="last60min">Letzte 60 Minuten</option>
@@ -41,13 +108,12 @@
                 <option value="last24h">Letzte 24 Stunden</option>
                 <option value="all" selected>Gesamter Verlauf</option>
             </select>
-            <button onclick="applyBarFilters()">Anzeigen</button>
             <div class="input-group">
                 <label for="balken-von-datum-zeit">Von:</label>
                 <input type="datetime-local" id="balken-von-datum-zeit">
                 <label for="balken-bis-datum-zeit">Bis:</label>
                 <input type="datetime-local" id="balken-bis-datum-zeit">
-                <button onclick="applyBarFilters()">Filter anwenden</button>
+                <button class="pulldown" onclick="applyBarFilters()">Filter anwenden</button>
             </div>
         </div>
         <div id="gesamtanzahl"></div>
@@ -56,8 +122,8 @@
     <div class="chart-block">
         <h2>Fahrzeugdichte im Zeitverlauf (Auto und andere getrennt)</h2>
         <div class="filter-block">
-            Zeitraum-Voreinstellung:
-            <select id="zeitraum-preset">
+            Zeitraum:
+            <select id="zeitraum-preset" class="pulldown">
                 <option value="last10min">Letzte 10 Minuten</option>
                 <option value="last30min">Letzte 30 Minuten</option>
                 <option value="last60min">Letzte 60 Minuten</option>
@@ -65,18 +131,16 @@
                 <option value="last24h">Letzte 24 Stunden</option>
                 <option value="all" selected>Gesamter Verlauf</option>
             </select>
-            <button onclick="applyFilters()">Anzeigen</button>
             <div class="input-group">
                 <label for="von-datum-zeit">Von:</label>
                 <input type="datetime-local" id="von-datum-zeit">
                 <label for="bis-datum-zeit">Bis:</label>
                 <input type="datetime-local" id="bis-datum-zeit">
-                <button onclick="applyFilters()">Filter anwenden</button>
+                <button class="pulldown" onclick="applyFilters()">Filter anwenden</button>
             </div>
         </div>
         <canvas id="fahrzeug-linie-auto"></canvas>
-        <div style="height: 30px"></div>
-        <canvas id="fahrzeug-linie-andere"></canvas>
+        <canvas id="fahrzeug-linie-andere" style="margin-top:50px;"></canvas>
         <div class="hinweis">
             Hinweis: Die Fahrzeugdichte wird berechnet als Anzahl Fahrzeuge pro gewähltem Zeitintervall (z.B. 1 Min., 5 Min. oder 1 Std.) und Fahrzeugtyp.<br>
             Die Werte pro X-Achse zeigen dabei die Summe der Fahrzeuge je Intervall und Typ.
@@ -422,7 +486,7 @@ function renderLineCharts(labels, datasetsAuto, datasetsAndere) {
     });
 }
 
-// Eventlistener für Dropdowns
+// Eventlistener für Dropdowns (sofortige Aktualisierung)
 document.getElementById('zeitraum-preset').addEventListener('change', applyFilters);
 document.getElementById('balken-zeitraum-preset').addEventListener('change', applyBarFilters);
 
