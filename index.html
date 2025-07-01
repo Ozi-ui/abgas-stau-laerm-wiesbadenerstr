@@ -1,290 +1,86 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Strassen-, Fahrzeug- und Lärmmessung B455 – Wiesbadener Straße, Königstein</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; max-width: 1100px; background: #f5f5f5; }
-        h1, h2 { color: #113366; }
-        .chart-container { background: #fff; padding: 24px; margin-bottom: 32px; border-radius: 10px; box-shadow: 0 3px 12px #aaa2; }
-        .controls label { margin-right: 1em; }
-        .argbox { background: #ddeeff; padding: 16px; border-radius: 8px; margin-bottom: 24px;}
-    </style>
+  <meta charset="UTF-8">
+  <title>Nachbarschaft Lärmschutz Wiesbadener Straße</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fa; color: #222; }
+    .container { display: flex; min-height: 100vh; }
+    nav { width: 270px; background: #1854a3; color: #fff; display: flex; flex-direction: column; padding-top: 32px; box-shadow: 2px 0 12px #0002; position: sticky; top: 0; min-height: 100vh; z-index: 10;}
+    nav h1 { font-size: 1.3em; font-weight: 700; margin: 0 0 2em 0; padding: 0 30px; line-height: 1.2; color: #fff;}
+    nav ul { list-style: none; padding: 0; margin: 0 0 2em 0;}
+    nav li { margin-bottom: 0.3em;}
+    nav a { color: #fff; text-decoration: none; display: block; padding: 14px 36px; font-size: 1.07em; border-left: 4px solid transparent; transition: background 0.19s, border 0.19s; letter-spacing: 0.01em;}
+    nav a.active, nav a:hover { background: #2365c9; border-left: 4px solid #fff;}
+    .main { flex: 1; padding: 44px 5vw 44px 5vw; max-width: 900px; margin: 0 auto; background: #fff; box-shadow: 0 4px 24px #1854a318; border-radius: 0 0 22px 22px;}
+    .main h2 { color: #1854a3; margin-top: 2.1em;}
+    .main h3 { margin-bottom: 0.6em;}
+    @media (max-width: 900px) {
+      .container { flex-direction: column; }
+      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
+      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
+    }
+    ul, ol { margin-top: 0.18em; }
+    ul.probleme, ul.forderungen, ul.gefahr, ul.maengel {
+      list-style: disc inside;
+      margin-bottom: 1.2em;
+    }
+  </style>
 </head>
 <body>
-    <h1>Aktuelle Straßen-, Fahrzeug- und Lärmmessung der Bundesstraße B455<br><span style="font-size:0.7em;">(Wiesbadener Straße, Königstein)</span></h1>
-    
-    <div class="argbox">
-        <h2>Hintergrund: Lärmbelastung und Verkehrsdichte</h2>
-        <p>
-            Die Wiesbadener Straße (B455) in Königstein ist eine der meistbefahrenen Strecken im Taunus und verläuft mitten durch Wohngebiete.
-            Hohe Verkehrsdichte, insbesondere während der Stoßzeiten, führt zu erheblicher Lärmbelastung. 
-            Laut Weltgesundheitsorganisation (WHO) beginnt eine gesundheitlich bedenkliche Lärmbelastung ab 55 dB (Tag/Nacht-Mittel).
-            Dauerhafte Werte über 65 dB gelten als kritisch, ab 70 dB steigt das Risiko für gesundheitliche Schäden deutlich.
-            <br>
-            Ziel dieser Seite ist die transparente, aktuelle und historische Darstellung der Messdaten zu Lärm und Fahrzeugaufkommen, um die Situation sichtbar zu machen und Argumente für Maßnahmen zur Verkehrsberuhigung zu liefern.
-        </p>
-    </div>
-
-    <!-- Lärmpegel Live Grafik -->
-    <div class="chart-container">
-        <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
-        <div id="laermpegel-live"></div>
-        <small>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</small>
-    </div>
-
-    <!-- Historische Lärmpegel Grafik mit Auswahl -->
-    <div class="chart-container">
-        <h2>Historische Lärmpegel-Auswertung</h2>
-        <div class="controls">
-            <label>Zeitraum: 
-                <select id="laerm-historic-select">
-                    <option value="10">Letzte 10 Minuten</option>
-                    <option value="30">Letzte 30 Minuten</option>
-                    <option value="720">Letzte 12 Stunden</option>
-                    <option value="1440">Letzte 24 Stunden</option>
-                    <option value="custom">Benutzerdefiniert</option>
-                </select>
-            </label>
-            <span id="laerm-custom-controls" style="display:none">
-                Von: <input type="datetime-local" id="laerm-from">
-                Bis: <input type="datetime-local" id="laerm-to">
-            </span>
-            <button onclick="drawLaermHistoric()">Aktualisieren</button>
-        </div>
-        <div id="laermpegel-historic"></div>
-    </div>
-
-    <!-- Fahrzeuganzahl Balken Diagramm mit Auswahl -->
-    <div class="chart-container">
-        <h2>Fahrzeugaufkommen (Balkendiagramm)</h2>
-        <div class="controls">
-            <label>Zeitraum: 
-                <select id="vehicle-historic-select">
-                    <option value="10">Letzte 10 Minuten</option>
-                    <option value="30">Letzte 30 Minuten</option>
-                    <option value="720">Letzte 12 Stunden</option>
-                    <option value="1440">Letzte 24 Stunden</option>
-                    <option value="custom">Benutzerdefiniert</option>
-                </select>
-            </label>
-            <span id="vehicle-custom-controls" style="display:none">
-                Von: <input type="datetime-local" id="vehicle-from">
-                Bis: <input type="datetime-local" id="vehicle-to">
-            </span>
-            <button onclick="drawVehicleBar()">Aktualisieren</button>
-        </div>
-        <div id="vehicle-bar"></div>
-    </div>
-
-    <!-- Fahrzeugdichte Zeitreihe -->
-    <div class="chart-container">
-        <h2>Fahrzeugdichte (Zeitreihe)</h2>
-        <div class="controls">
-            <label>Zeitraum: 
-                <select id="vehicle-density-select">
-                    <option value="10">Letzte 10 Minuten</option>
-                    <option value="30">Letzte 30 Minuten</option>
-                    <option value="720">Letzte 12 Stunden</option>
-                    <option value="1440">Letzte 24 Stunden</option>
-                    <option value="custom">Benutzerdefiniert</option>
-                </select>
-            </label>
-            <span id="vehicle-density-custom-controls" style="display:none">
-                Von: <input type="datetime-local" id="density-from">
-                Bis: <input type="datetime-local" id="density-to">
-            </span>
-            <button onclick="drawVehicleDensity()">Aktualisieren</button>
-        </div>
-        <div id="vehicle-density"></div>
-    </div>
-
-    <script>
-    // Helper: Parse pegel.txt
-    async function loadLaermData() {
-        const res = await fetch('Daten/pegel.txt');
-        const txt = await res.text();
-        return txt.split('\n')
-            .map(l => {
-                const m = l.match(/^([\d\-]+ [\d:]+) - Maximaler Pegel: ([\d.]+) dB$/);
-                if(m) return {time: new Date(m[1]), value: parseFloat(m[2])};
-                return null;
-            })
-            .filter(x => x);
-    }
-
-    // Helper: Parse vehicle_counts.txt
-    async function loadVehicleData() {
-        const res = await fetch('Daten/vehicle_counts.txt');
-        const txt = await res.text();
-        return txt.split('\n')
-            .map(l => {
-                const m = l.match(/^([\d\-]+),\s*([\d:]+),\s*(\w+)/);
-                if(m) return {time: new Date(m[1] + 'T' + m[2]), type: m[3]};
-                return null;
-            })
-            .filter(x => x);
-    }
-
-    // WHO Werte
-    const WHO_LINES = [
-        {y:55, color:'green', dash:'dot', label:'WHO Empfehlung 55 dB'},
-        {y:65, color:'orange', dash:'dash', label:'Kritischer Wert 65 dB'},
-        {y:70, color:'red', dash:'solid', label:'Gesundheitsschädlich 70 dB'}
-    ];
-
-    // Live Lärmpegel (letzte 5 Minuten)
-    async function drawLaermLive() {
-        const data = await loadLaermData();
-        const tmax = data.length > 0 ? data[data.length-1].time : new Date();
-        const tmin = new Date(tmax.getTime() - 5*60000);
-        const live = data.filter(d => d.time >= tmin && d.time <= tmax);
-        const trace = {
-            x: live.map(d=>d.time),
-            y: live.map(d=>d.value),
-            type: 'scatter',
-            mode: 'lines+markers',
-            name: 'Lärmpegel',
-            line: {color: 'blue'}
-        };
-        const layout = {
-            title: 'Lärmpegel (letzte 5 Minuten)',
-            xaxis: {title: 'Zeit'},
-            yaxis: {title: 'dB', range: [30, 100]},
-            shapes: WHO_LINES.map(line => ({
-                type:'line', xref:'paper', x0:0, x1:1, y0:line.y, y1:line.y,
-                line:{color:line.color, dash:line.dash, width:2}
-            })),
-            annotations: WHO_LINES.map(line => ({
-                xref:'paper', x:1.01, y:line.y, yref:'y', text:line.label, showarrow:false, font:{color:line.color}
-            })),
-            margin: {r:120}
-        };
-        Plotly.newPlot('laermpegel-live', [trace], layout);
-    }
-    setInterval(drawLaermLive, 5*60*1000); // alle 5 Minuten aktualisieren
-    drawLaermLive();
-
-    // Historische Lärmpegel
-    async function drawLaermHistoric() {
-        const data = await loadLaermData();
-        let from, to;
-        const sel = document.getElementById('laerm-historic-select').value;
-        if(sel === 'custom') {
-            from = new Date(document.getElementById('laerm-from').value);
-            to = new Date(document.getElementById('laerm-to').value);
-        } else {
-            to = data.length > 0 ? data[data.length-1].time : new Date();
-            from = new Date(to.getTime() - parseInt(sel)*60000);
-        }
-        const filtered = data.filter(d => d.time >= from && d.time <= to);
-
-        const trace = {
-            x: filtered.map(d=>d.time),
-            y: filtered.map(d=>d.value),
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Lärmpegel',
-            line: {color: 'blue'}
-        };
-        const layout = {
-            title: `Lärmpegel Verlauf`,
-            xaxis: {title: 'Zeit'},
-            yaxis: {title: 'dB', range: [30, 100]},
-            shapes: WHO_LINES.map(line => ({
-                type:'line', xref:'paper', x0:0, x1:1, y0:line.y, y1:line.y,
-                line:{color:line.color, dash:line.dash, width:2}
-            })),
-            annotations: WHO_LINES.map(line => ({
-                xref:'paper', x:1.01, y:line.y, yref:'y', text:line.label, showarrow:false, font:{color:line.color}
-            })),
-            margin: {r:120}
-        };
-        Plotly.newPlot('laermpegel-historic', [trace], layout);
-    }
-    document.getElementById('laerm-historic-select').addEventListener('change', function() {
-        document.getElementById('laerm-custom-controls').style.display = this.value==='custom' ? '' : 'none';
-    });
-    drawLaermHistoric();
-
-    // Fahrzeuganzahl Balken
-    async function drawVehicleBar() {
-        const data = await loadVehicleData();
-        let from, to;
-        const sel = document.getElementById('vehicle-historic-select').value;
-        if(sel === 'custom') {
-            from = new Date(document.getElementById('vehicle-from').value);
-            to = new Date(document.getElementById('vehicle-to').value);
-        } else {
-            to = data.length > 0 ? data[data.length-1].time : new Date();
-            from = new Date(to.getTime() - parseInt(sel)*60000);
-        }
-        const filtered = data.filter(d => d.time >= from && d.time <= to);
-        const counts = {};
-        filtered.forEach(d => { counts[d.type]=(counts[d.type]||0)+1; });
-        const types = Object.keys(counts);
-        const values = types.map(t=>counts[t]);
-
-        const trace = {
-            x: types,
-            y: values,
-            type: 'bar',
-            marker: {color: ['#4a90e2', '#f5a623', '#7ed321', '#d0021b', '#bd10e0']}
-        };
-        const layout = {
-            title: 'Fahrzeugaufkommen (Summe im Zeitraum)',
-            xaxis: {title: 'Fahrzeugtyp'},
-            yaxis: {title: 'Anzahl'}
-        };
-        Plotly.newPlot('vehicle-bar', [trace], layout);
-    }
-    document.getElementById('vehicle-historic-select').addEventListener('change', function() {
-        document.getElementById('vehicle-custom-controls').style.display = this.value==='custom' ? '' : 'none';
-    });
-    drawVehicleBar();
-
-    // Fahrzeugdichte Zeitreihe
-    async function drawVehicleDensity() {
-        const data = await loadVehicleData();
-        let from, to;
-        const sel = document.getElementById('vehicle-density-select').value;
-        if(sel === 'custom') {
-            from = new Date(document.getElementById('density-from').value);
-            to = new Date(document.getElementById('density-to').value);
-        } else {
-            to = data.length > 0 ? data[data.length-1].time : new Date();
-            from = new Date(to.getTime() - parseInt(sel)*60000);
-        }
-        const filtered = data.filter(d => d.time >= from && d.time <= to);
-
-        // z.B. alle 5 Minuten aufsummieren
-        const bins = {};
-        filtered.forEach(d => {
-            const bin = new Date(Math.floor(d.time.getTime()/300000)*300000).toISOString();
-            bins[bin] = (bins[bin]||0)+1;
-        });
-        const x = Object.keys(bins).map(t=>new Date(t));
-        const y = Object.values(bins);
-
-        const trace = {
-            x: x,
-            y: y,
-            type: 'scatter',
-            mode: 'lines+markers',
-            line: {color: '#f5a623'}
-        };
-        const layout = {
-            title: 'Fahrzeugdichte (je 5 Minuten)',
-            xaxis: {title: 'Zeit'},
-            yaxis: {title: 'Fahrzeuge je 5 Minuten'}
-        };
-        Plotly.newPlot('vehicle-density', [trace], layout);
-    }
-    document.getElementById('vehicle-density-select').addEventListener('change', function() {
-        document.getElementById('vehicle-density-custom-controls').style.display = this.value==='custom' ? '' : 'none';
-    });
-    drawVehicleDensity();
-    </script>
+<div class="container">
+  <nav>
+    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
+    <ul>
+      <li>
+        <a href="index.html" class="active">Startseite</a>
+      </li>
+      <li>
+        <a href="laerm.html">Lärmmessung</a>
+      </li>
+      <li>
+        <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
+      </li>
+    </ul>
+  </nav>
+  <div class="main">
+    <p>
+      Unsere Nachbarschaft braucht endlich Schutz, Ruhe – und Gehör.<br>
+      Wir, die Anwohnerinnen und Anwohner der <strong>Wiesbadener Straße</strong>, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung in unserem Wohngebiet. Was hier passiert, ist unzumutbar – für unsere Gesundheit, unsere Lebensqualität und nicht zuletzt unsere Sicherheit.
+    </p>
+    <h3>🚨 Die wichtigsten Probleme im Überblick:</h3>
+    <ul class="probleme">
+      <li><b>Überschreitung der Geschwindigkeitsbegrenzung:</b> Trotz der klar ausgeschilderten 30er-Zone rasen Fahrzeuge regelmäßig mit deutlich höherer Geschwindigkeit durch unsere Straße – Tag und Nacht.</li>
+      <li><b>Lärmbelastung rund um die Uhr:</b> Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt.</li>
+      <li><b>Lüften kaum möglich:</b> Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich.</li>
+      <li><b>Garten? Fehlanzeige!</b> Unser eigener Garten kann nicht mehr als Ort der Erholung dienen – das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Nicht denkbar bei diesem Lärmpegel.</li>
+      <li><b>Stau am Morgen – Stress zum Tagesbeginn:</b> Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung.</li>
+      <li><b>Gesundheitliche Belastung:</b> Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aller Bewohnerinnen und Bewohner aus – besonders auf Kinder und ältere Menschen.</li>
+    </ul>
+    <h3>🚶‍♀️ Gefahr für Fußgänger – besonders für Kinder und Senioren</h3>
+    <ul class="gefahr">
+      <li>Es gibt keinen Zebrastreifen oder sichere Überquerungsmöglichkeit – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand.</li>
+      <li>An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine.</li>
+      <li>Fahrradfahrer sind ebenfalls gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind.</li>
+    </ul>
+    <h3>🛣 Weitere Mängel:</h3>
+    <ul class="maengel">
+      <li>Zahlreiche Schlaglöcher: Diese führen dazu, dass LKWs und Transporter bei jeder Fahrt zusätzlichen Lärm erzeugen und möglicherweise Schäden an den Fahrzeugen verursachen.</li>
+      <li>Unzureichende Verkehrsüberwachung: Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können.</li>
+    </ul>
+    <h3>✅ Unsere Forderungen:</h3>
+    <ul class="forderungen">
+      <li>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen</li>
+      <li>Bauliche Verkehrsberuhigung, z. B. durch Fahrbahnverengungen, Bodenschwellen oder Blumenkübel</li>
+      <li>Einrichtung eines Zebrastreifens oder einer Ampel in zentraler Lage</li>
+      <li>Tempolimit-Kontrolle durch Sensoren oder digitale Anzeigetafeln</li>
+      <li>Sanierung der Straßendecke zur Reduzierung des Lärmpegels</li>
+      <li>Regelmäßige Luft- und Lärmmessungen mit Veröffentlichung der Ergebnisse</li>
+      <li>Einrichtung einer Bürgerbeteiligung zur langfristigen Verkehrsplanung</li>
+    </ul>
+    <h3>🙌 Wir brauchen deine Unterstützung!</h3>
+  </div>
+</div>
 </body>
 </html>
