@@ -1,1 +1,199 @@
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lärmmessung – Wiesbadener Straße</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fa; color: #222; }
+    .container { display: flex; min-height: 100vh; }
+    nav { width: 270px; background: #1854a3; color: #fff; display: flex; flex-direction: column; padding-top: 32px; box-shadow: 2px 0 12px #0002; position: sticky; top: 0; min-height: 100vh; z-index: 10;}
+    nav h1 { font-size: 1.3em; font-weight: 700; margin: 0 0 2em 0; padding: 0 30px; line-height: 1.2; color: #fff;}
+    nav ul { list-style: none; padding: 0; margin: 0 0 2em 0;}
+    nav li { margin-bottom: 0.3em;}
+    nav a { color: #fff; text-decoration: none; display: block; padding: 14px 36px; font-size: 1.07em; border-left: 4px solid transparent; transition: background 0.19s, border 0.19s; letter-spacing: 0.01em;}
+    nav a.active, nav a:hover { background: #2365c9; border-left: 4px solid #fff;}
+    nav .nav-sub { margin-left: 1em; margin-bottom: 0.2em; font-size: 0.98em;}
+    .main { flex: 1; padding: 44px 5vw 44px 5vw; max-width: 900px; margin: 0 auto; background: #fff; box-shadow: 0 4px 24px #1854a318; border-radius: 0 0 22px 22px;}
+    .blue-head { background: linear-gradient(90deg, #2176ff 85%, #143e74 100%); color: #fff; font-size: 2.0em; font-weight: 600; padding: 30px 36px 28px 36px; margin: -44px -5vw 36px -5vw; border-radius: 0 0 18px 0; box-shadow: 2px 6px 24px #1854a330; letter-spacing: 0.02em; line-height: 1.13;}
+    .chart-section { margin: 28px 0 48px 0; }
+    .chart-container { background: #f8fbff; border-radius: 10px; padding: 22px 20px; margin-bottom: 23px; box-shadow: 0 2px 18px #0001; max-width: 700px; }
+    .chart-controls { margin-bottom: 10px; font-size: 0.98em;}
+    .chart-controls label, .chart-controls select, .chart-controls input, .chart-controls button { margin-right: 10px; margin-bottom: 4px;}
+    @media (max-width: 900px) {
+      .container { flex-direction: column; }
+      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
+      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
+      .blue-head { font-size: 1.2em; padding: 16px 10px; margin: -20px -2vw 24px -2vw;}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <nav>
+    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
+    <ul>
+      <li>
+        <a href="laerm.html" class="active">Lärmmessung</a>
+        <div class="nav-sub">
+          <div>• Aktuelle Lärmpegel</div>
+          <div>• Historische Lärmpegel</div>
+        </div>
+      </li>
+      <li>
+        <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
+        <div class="nav-sub">
+          <div>• Aktuelles Fahrzeugaufkommen (1h)</div>
+          <div>• Historisches Fahrzeugaufkommen</div>
+          <div>• Balkendiagramm Fahrzeugaufkommen</div>
+        </div>
+      </li>
+      <li>
+        <a href="index.html">Startseite</a>
+      </li>
+    </ul>
+  </nav>
+  <div class="main">
+    <div class="blue-head">
+      Lärmmessung
+    </div>
+    <section class="chart-section" id="laerm">
+      <div class="chart-container">
+        <h4>Aktueller Lärmpegel (letzte 5 Minuten)</h4>
+        <div id="laermpegel-live" style="height:300px;"></div>
+      </div>
+      <div class="chart-container">
+        <h4>Historischer Lärmpegel</h4>
+        <div class="chart-controls">
+          <label>Zeitraum:
+            <select id="laerm-historic-interval">
+              <option value="10">Letzte 10 Minuten</option>
+              <option value="20">Letzte 20 Minuten</option>
+              <option value="30">Letzte 30 Minuten</option>
+              <option value="60">Letzte 1 Stunde</option>
+              <option value="720">Letzte 12 Stunden</option>
+              <option value="1440" selected>Letzte 24 Stunden</option>
+            </select>
+          </label>
+          <label>Von: <input type="datetime-local" id="laerm-historic-from"></label>
+          <label>Bis: <input type="datetime-local" id="laerm-historic-to"></label>
+          <button onclick="drawLaermHistoricCustom()">Anzeigen</button>
+        </div>
+        <div id="laermpegel-historic" style="height:300px;"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  async function loadLaermData() {
+    const res = await fetch('Daten/pegel.txt');
+    const txt = await res.text();
+    return txt.split('\n')
+      .map(l => {
+        const m = l.match(/^([\d\-]+ [\d:]+) - Maximaler Pegel: ([\d.]+) dB$/);
+        if(m) return {time: new Date(m[1]), value: parseFloat(m[2])};
+        return null;
+      })
+      .filter(x => x);
+  }
+  function getWhoShapes() {
+    return [
+      { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 55, y1: 55, line: {color: 'red', width: 2, dash: 'dot'}, },
+      { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 45, y1: 45, line: {color: 'orange', width: 2, dash: 'dot'}, }
+    ];
+  }
+  // Lärmmessung: Aktuell (Live, 5 Minuten)
+  async function drawLaermLive() {
+    const data = await loadLaermData();
+    const tmax = data.length > 0 ? data[data.length-1].time : new Date();
+    const tmin = new Date(tmax.getTime() - 5*60000);
+    const live = data.filter(d => d.time >= tmin && d.time <= tmax);
+    const trace = {
+      x: live.map(d=>d.time),
+      y: live.map(d=>d.value),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Lärmpegel',
+      line: {color: '#2176ff'}
+    };
+    const layout = {
+      shapes: getWhoShapes(),
+      xaxis: {title: 'Zeit'},
+      yaxis: {title: 'dB', range: [30, 100]},
+      margin: {t:20},
+      legend: {orientation: "h"},
+      annotations: [
+        {x:1, y:55, xref:'paper', yref:'y', text:'WHO Tag', showarrow:false, font:{color:'red'}, xanchor:'left'},
+        {x:1, y:45, xref:'paper', yref:'y', text:'WHO Nacht', showarrow:false, font:{color:'orange'}, xanchor:'left'}
+      ]
+    };
+    Plotly.newPlot('laermpegel-live', [trace], layout, {responsive:true});
+  }
+  setInterval(drawLaermLive, 5*60*1000);
+  drawLaermLive();
+
+  // Lärmmessung: Historisch (Dropdown & von/bis)
+  document.getElementById('laerm-historic-interval').addEventListener('change', drawLaermHistoric);
+  async function drawLaermHistoric() {
+    const data = await loadLaermData();
+    const intervalMin = parseInt(document.getElementById('laerm-historic-interval').value, 10);
+    const to = data.length > 0 ? data[data.length-1].time : new Date();
+    const from = new Date(to.getTime() - intervalMin*60*1000);
+    const filtered = data.filter(d => d.time >= from && d.time <= to);
+    const trace = {
+      x: filtered.map(d=>d.time),
+      y: filtered.map(d=>d.value),
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Lärmpegel',
+      line: {color: '#2176ff'}
+    };
+    const layout = {
+      shapes: getWhoShapes(),
+      xaxis: {title: 'Zeit'},
+      yaxis: {title: 'dB', range: [30, 100]},
+      margin: {t:20},
+      legend: {orientation: "h"},
+      annotations: [
+        {x:1, y:55, xref:'paper', yref:'y', text:'WHO Tag', showarrow:false, font:{color:'red'}, xanchor:'left'},
+        {x:1, y:45, xref:'paper', yref:'y', text:'WHO Nacht', showarrow:false, font:{color:'orange'}, xanchor:'left'}
+      ]
+    };
+    Plotly.newPlot('laermpegel-historic', [trace], layout, {responsive:true});
+  }
+  drawLaermHistoric();
+
+  async function drawLaermHistoricCustom() {
+    const data = await loadLaermData();
+    const fromVal = document.getElementById('laerm-historic-from').value;
+    const toVal = document.getElementById('laerm-historic-to').value;
+    if (!fromVal || !toVal) return;
+    const from = new Date(fromVal);
+    const to = new Date(toVal);
+    const filtered = data.filter(d => d.time >= from && d.time <= to);
+    const trace = {
+      x: filtered.map(d=>d.time),
+      y: filtered.map(d=>d.value),
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Lärmpegel',
+      line: {color: '#2176ff'}
+    };
+    const layout = {
+      shapes: getWhoShapes(),
+      xaxis: {title: 'Zeit'},
+      yaxis: {title: 'dB', range: [30, 100]},
+      margin: {t:20},
+      legend: {orientation: "h"},
+      annotations: [
+        {x:1, y:55, xref:'paper', yref:'y', text:'WHO Tag', showarrow:false, font:{color:'red'}, xanchor:'left'},
+        {x:1, y:45, xref:'paper', yref:'y', text:'WHO Nacht', showarrow:false, font:{color:'orange'}, xanchor:'left'}
+      ]
+    };
+    Plotly.newPlot('laermpegel-historic', [trace], layout, {responsive:true});
+  }
+</script>
+</body>
+</html>
