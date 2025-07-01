@@ -1,91 +1,189 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Lärmmessung – Nachbarschaft Lärmschutz Wiesbadener Straße</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-    .container { display: flex; min-height: 100vh; }
-    nav { background: #1758a5; color: #fff; min-width: 240px; padding: 0 0 40px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
-    nav h1 { font-size: 1.3em; font-weight: 700; line-height: 1.2; padding: 24px 16px 18px 16px; margin: 0 0 14px 0; }
-    nav ul { list-style: none; padding: 0; margin: 0; }
-    nav li { margin-bottom: 10px; }
-    nav a { color: #fff; text-decoration: none; display: block; padding: 12px 16px; font-weight: 600; border-radius: 4px 0 0 4px; transition: background 0.2s; }
-    nav a.active, nav a:hover { background-color: #0e4080; }
-    .nav-sub { font-size: 0.97em; padding-left: 19px; color: #b5d8ff; }
-    .main { flex: 1; padding: 40px 40px 40px 40px; background: #fff; border-radius: 0 10px 10px 0; }
-    .blue-head { background: #1758a5; color: #fff; padding: 20px 18px; border-radius: 8px; margin-bottom: 28px; font-size: 1.3em; font-weight: 600; }
-    .chart-section { margin-bottom: 38px;}
-    .chart-container { background: #f9fbfe; padding: 18px 18px 8px 18px; border-radius: 8px; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(23,88,165,0.03);}
-    .chart-controls { margin-bottom: 10px; font-size: 0.98em;}
-    .chart-controls label, .chart-controls select, .chart-controls input, .chart-controls button { margin-right: 10px; margin-bottom: 4px;}
-    @media (max-width: 900px) {
-      .container { flex-direction: column; }
-      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
-      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
-      .blue-head { font-size: 1.2em; padding: 16px 10px; margin: -20px -2vw 24px -2vw;}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Lärmpegel-Auswertung</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
+        h2 { margin-top: 40px; }
+        #container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+        .chart-block { margin-bottom: 50px; }
+    </style>
 </head>
 <body>
-<div class="container">
-  <nav>
-    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
-    <ul>
-      <li>
-        <a href="index.html">Startseite</a>
-      </li>
-      <li>
-        <a href="laerm.html" class="active">Lärmmessung</a>
-        <div class="nav-sub">
-          <div>• Aktuelle Lärmpegel</div>
-          <div>• Historische Lärmpegel</div>
-        </div>
-      </li>
-      <li>
-        <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
-        <div class="nav-sub">
-          <div>• Aktuelles Fahrzeugaufkommen (1h)</div>
-          <div>• Historisches Fahrzeugaufkommen</div>
-          <div>• Balkendiagramm Fahrzeugaufkommen</div>
-        </div>
-      </li>
-    </ul>
-  </nav>
-  <div class="main">
-    <div class="blue-head">
-      Lärmmessung
+<div id="container">
+    <h1>Lärmpegel Monitoring</h1>
+    <div class="chart-block">
+        <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
+        <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
+        <canvas id="laermpegel-live" height="80"></canvas>
     </div>
-    <section class="chart-section" id="laerm">
-      <div class="chart-container">
-        <h4>Aktueller Lärmpegel (letzte 5 Minuten)</h4>
-        <div id="laermpegel-live" style="height:300px;"></div>
-      </div>
-      <div class="chart-container">
-        <h4>Historischer Lärmpegel</h4>
-        <div class="chart-controls">
-          <label>Zeitraum:
-            <select id="laerm-historic-interval">
-              <option value="10">Letzte 10 Minuten</option>
-              <option value="20">Letzte 20 Minuten</option>
-              <option value="30">Letzte 30 Minuten</option>
-              <option value="60">Letzte 1 Stunde</option>
-              <option value="720">Letzte 12 Stunden</option>
-              <option value="1440" selected>Letzte 24 Stunden</option>
-            </select>
-          </label>
-          <label>Von: <input type="datetime-local" id="laerm-historic-from"></label>
-          <label>Bis: <input type="datetime-local" id="laerm-historic-to"></label>
-          <button onclick="drawLaermHistoricCustom()">Anzeigen</button>
-        </div>
-        <div id="laermpegel-historic" style="height:300px;"></div>
-      </div>
-    </section>
-  </div>
+    <div class="chart-block">
+        <h2>Historische Lärmpegel-Auswertung</h2>
+        Zeitraum: 
+        <select id="zeitraum">
+            <option value="10">Letzte 10 Minuten</option>
+            <option value="30">Letzte 30 Minuten</option>
+            <option value="60">Letzte 60 Minuten</option>
+            <option value="all">Alles</option>
+        </select>
+        <button onclick="ladePegelDaten()">Aktualisieren</button>
+        <canvas id="laermpegel-historic" height="80"></canvas>
+    </div>
 </div>
+
 <script>
-// Dein bestehender JS-Code bleibt hier
+let alleLabels = [];
+let alleDaten = [];
+
+// Hilfsfunktion: pegel.txt laden und parsen
+async function fetchPegelDaten() {
+    const response = await fetch('Daten/pegel.txt');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    const labels = [];
+    const daten = [];
+    lines.forEach(line => {
+        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([0-9.]+) dB$/);
+        if (match) {
+            labels.push(match[1]);
+            daten.push(parseFloat(match[2]));
+        }
+    });
+    return {labels, daten};
+}
+
+// WHO-Linien generieren
+function genGrenzwertArray(wert, len) {
+    return Array(len).fill(wert);
+}
+
+let liveChart;
+let historicChart;
+
+async function ladePegelDaten() {
+    const { labels, daten } = await fetchPegelDaten();
+    alleLabels = labels;
+    alleDaten = daten;
+
+    // Live: letzte 10 Werte (ca. 5 Minuten bei 30s-Takt)
+    const liveLabels = labels.slice(-10).map(l => l.substring(11)); // Nur Uhrzeit
+    const liveDaten = daten.slice(-10);
+
+    if (liveChart) liveChart.destroy();
+    liveChart = new Chart(document.getElementById('laermpegel-live').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: liveLabels,
+            datasets: [
+                {
+                    label: 'Lärmpegel (dB)',
+                    data: liveDaten,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,255,0.10)',
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'WHO Empfehlung (55 dB)',
+                    data: genGrenzwertArray(55, liveLabels.length),
+                    borderColor: 'green',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO kritisch (65 dB)',
+                    data: genGrenzwertArray(65, liveLabels.length),
+                    borderColor: 'orange',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO gesundheitsschädlich (70 dB)',
+                    data: genGrenzwertArray(70, liveLabels.length),
+                    borderColor: 'red',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: { min: 40, max: 80, title: {display:true, text:'dB'} }
+            }
+        }
+    });
+
+    updateHistoricChart();
+}
+
+function updateHistoricChart() {
+    const zeitraum = document.getElementById('zeitraum').value;
+    let labels, daten;
+    if (zeitraum === 'all') {
+        labels = alleLabels.map(l => l.substring(11));
+        daten = alleDaten;
+    } else {
+        const len = parseInt(zeitraum);
+        labels = alleLabels.slice(-len).map(l => l.substring(11));
+        daten = alleDaten.slice(-len);
+    }
+    if (historicChart) historicChart.destroy();
+    historicChart = new Chart(document.getElementById('laermpegel-historic').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Lärmpegel (dB)',
+                    data: daten,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,255,0.10)',
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'WHO Empfehlung (55 dB)',
+                    data: genGrenzwertArray(55, labels.length),
+                    borderColor: 'green',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO kritisch (65 dB)',
+                    data: genGrenzwertArray(65, labels.length),
+                    borderColor: 'orange',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO gesundheitsschädlich (70 dB)',
+                    data: genGrenzwertArray(70, labels.length),
+                    borderColor: 'red',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: { min: 40, max: 80, title: {display:true, text:'dB'} }
+            }
+        }
+    });
+}
+
+document.getElementById('zeitraum').addEventListener('change', updateHistoricChart);
+
+// Beim Laden initialisieren
+ladePegelDaten();
 </script>
 </body>
 </html>
