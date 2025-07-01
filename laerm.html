@@ -7,18 +7,25 @@
     <style>
         body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
         h2 { margin-top: 40px; }
-        #container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
-        .chart-block { margin-bottom: 50px; }
-        .input-row { margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap;}
+        #container { max-width: 1000px; margin: auto; background: #fff; padding: 36px; border-radius: 10px; box-shadow: 0 0 16px #c2c2c2; }
+        .chart-block { margin-bottom: 55px; }
+        .input-row { margin-bottom: 18px; display: flex; align-items: center; flex-wrap: wrap;}
         .nav { margin-bottom: 30px; background: #224e7a; color: #fff; padding: 14px 24px; border-radius: 6px;}
         .nav a { color: #fff; margin-right: 30px; text-decoration: none; font-weight: bold;}
         .nav a:hover { text-decoration: underline; }
         .input-row label { margin-right: 8px; }
-        .btn-group button {margin-right: 8px;}
-        @media (max-width: 600px) {
-            #container { padding: 5vw; }
+        @media (max-width: 800px) {
+            #container { padding: 3vw; }
             .input-row { flex-direction: column; align-items: stretch;}
-            .btn-group { margin: 10px 0;}
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100%;
+            min-height: 320px;
+            border-radius: 8px;
+            background: #fafcff;
+            box-shadow: 0 2px 8px #dde2ee;
         }
     </style>
 </head>
@@ -29,27 +36,27 @@
         <a href="laerm.html">Lärmpegel</a>
         <a href="abgas.html">Abgas</a>
         <a href="stau.html">Stau</a>
-        <!-- weitere Links je nach Bedarf -->
     </div>
     <h1>Lärmpegel Monitoring</h1>
 
     <div class="chart-block">
         <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
         <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
-        <canvas id="laermpegel-live" height="80"></canvas>
+        <canvas id="laermpegel-live" height="180" width="1000"></canvas>
     </div>
 
     <div class="chart-block">
         <h2>Historische Lärmpegel-Auswertung</h2>
         <div class="input-row">
-            <div class="btn-group">
-                <button onclick="setZeitraumPreset(10)">10 Min</button>
-                <button onclick="setZeitraumPreset(30)">30 Min</button>
-                <button onclick="setZeitraumPreset(60)">1 Stunde</button>
-                <button onclick="setZeitraumPreset(360)">6 Stunden</button>
-                <button onclick="setZeitraumPreset(720)">12 Stunden</button>
-                <button onclick="setZeitraumPreset(1440)">24 Stunden</button>
-            </div>
+            <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
+            <select id="zeitraum-select" onchange="setZeitraumSelect()">
+                <option value="10">letzte 10 Minuten</option>
+                <option value="30">letzte 30 Minuten</option>
+                <option value="60">letzte 1 Stunde</option>
+                <option value="360">letzte 6 Stunden</option>
+                <option value="720">letzte 12 Stunden</option>
+                <option value="1440">letzte 24 Stunden</option>
+            </select>
             <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
             <label for="von">von:</label>
             <input type="datetime-local" id="von" style="margin-right:8px;">
@@ -57,7 +64,7 @@
             <input type="datetime-local" id="bis" style="margin-right:8px;">
             <button onclick="zeitraumVonBis()">Anwenden</button>
         </div>
-        <canvas id="laermpegel-historic" height="80"></canvas>
+        <canvas id="laermpegel-historic" height="320" width="1000"></canvas>
     </div>
 </div>
 
@@ -68,18 +75,16 @@ const backgroundRangesPlugin = {
     beforeDatasetsDraw: (chart) => {
         const { ctx, chartArea, scales } = chart;
         if (!chartArea) return;
-        // Bereiche: [unten, oben, Farbe, Opazität]
         const ranges = [
-            [40, 55, 'green', 0.09],
-            [55, 65, 'yellow', 0.08],
-            [65, 70, 'orange', 0.08],
-            [70, 100, 'red', 0.07]
+            [40, 55, 'green', 0.07],
+            [55, 65, 'yellow', 0.07],
+            [65, 70, 'orange', 0.07],
+            [70, 100, 'red', 0.06]
         ];
         ranges.forEach(([yMin, yMax, color, alpha]) => {
             ctx.save();
             ctx.globalAlpha = alpha;
             ctx.fillStyle = color;
-            // Bereich in Pixel umrechnen (y0/y1 in px)
             const y0 = scales.y.getPixelForValue(yMax);
             const y1 = scales.y.getPixelForValue(yMin);
             ctx.fillRect(chartArea.left, y0, chartArea.right - chartArea.left, y1 - y0);
@@ -90,7 +95,7 @@ const backgroundRangesPlugin = {
 
 let alleLabels = [];
 let alleDaten = [];
-let alleRawLabels = []; // für Zeitfilter
+let alleRawLabels = [];
 let alleRawDaten = [];
 
 async function fetchPegelDaten() {
@@ -100,10 +105,9 @@ async function fetchPegelDaten() {
     const labels = [];
     const daten = [];
     lines.forEach(line => {
-        // Nur Jahr-Monat-Tag Stunde:Minute extrahieren, Sekunden werden ignoriert
         const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2} - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
         if (match) {
-            labels.push(match[1]); // 'YYYY-MM-DD HH:MM'
+            labels.push(match[1]);
             daten.push(parseFloat(match[2]));
         }
     });
@@ -117,26 +121,20 @@ function genGrenzwertArray(wert, len) {
 let liveChart;
 let historicChart;
 
-// Zeitauswahl-Helper
-function setZeitraumPreset(minuten) {
-    // Setzt die letzten X Minuten als Filter
+function setZeitraumSelect() {
+    const minuten = parseInt(document.getElementById('zeitraum-select').value, 10);
     document.getElementById('von').value = '';
     document.getElementById('bis').value = '';
     updateHistoricChartPreset(minuten);
 }
 
 function updateHistoricChartPreset(minuten) {
-    // Zeigt die letzten X Minuten an
     const now = new Date();
     const msBack = minuten * 60 * 1000;
     const timeBack = new Date(now.getTime() - msBack);
-
-    // alleRawLabels ist Array aus 'YYYY-MM-DD HH:MM'
-    // Wir suchen Entries >= timeBack bis zum aktuellsten (letzter Wert)
     const filteredIdx = alleRawLabels
         .map((label, idx) => ({label, idx}))
         .filter(obj => {
-            // label: 'YYYY-MM-DD HH:MM' -> 'YYYY-MM-DDTHH:MM'
             const d = new Date(obj.label.replace(' ', 'T'));
             return d >= timeBack;
         })
@@ -148,21 +146,16 @@ function updateHistoricChartPreset(minuten) {
         labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
-
     renderHistoricChart(labels, daten);
 }
 
 function zeitraumVonBis() {
-    // Holt Werte zwischen von und bis
     const von = document.getElementById('von').value;
     const bis = document.getElementById('bis').value;
     if (!von || !bis) {
         alert("Bitte 'von' und 'bis' Datum/Zeit wählen.");
         return;
     }
-    // von und bis sind im Format "YYYY-MM-DDTHH:MM"
-    // alleRawLabels sind "YYYY-MM-DD HH:MM"
-    // Wir ersetzen das ' ' durch 'T' zum Vergleich
     const vonDate = new Date(von);
     const bisDate = new Date(bis);
 
@@ -180,7 +173,6 @@ function zeitraumVonBis() {
         labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
-
     renderHistoricChart(labels, daten);
 }
 
@@ -204,18 +196,19 @@ async function ladePegelDaten() {
                 {
                     label: 'Lärmpegel (dB)',
                     data: liveDaten,
-                    borderColor: 'blue',
-                    borderWidth: 1.5,
-                    backgroundColor: 'rgba(0,0,255,0.08)',
+                    borderColor: '#1a74d6',
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
-                    tension: 0.1,
-                    pointRadius: 2,
-                    pointHoverRadius: 4
+                    tension: 0.3,
+                    pointRadius: 1.5,
+                    pointHoverRadius: 3,
+                    pointBackgroundColor: '#1a74d6'
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, liveLabels.length),
-                    borderColor: 'green',
+                    borderColor: '#1bc13b',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -224,7 +217,7 @@ async function ladePegelDaten() {
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, liveLabels.length),
-                    borderColor: 'orange',
+                    borderColor: '#e8a100',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -233,7 +226,7 @@ async function ladePegelDaten() {
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, liveLabels.length),
-                    borderColor: 'red',
+                    borderColor: '#e13c3c',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -243,11 +236,12 @@ async function ladePegelDaten() {
         },
         options: {
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: { cornerRadius: 6 }
+                legend: { position: 'top' },
+                tooltip: { cornerRadius: 8, backgroundColor: '#fff', titleColor: '#333', bodyColor: '#333' }
             },
             scales: {
-                y: { min: 40, max: 100, title: {display:true, text:'dB'} }
+                x: { grid: { color: '#eee' }, ticks: { color: '#555' } },
+                y: { min: 40, max: 100, title: {display:true, text:'dB'}, grid: { color: '#eee' }, ticks: { color: '#555' } }
             }
         },
         plugins: [backgroundRangesPlugin]
@@ -267,18 +261,19 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'Lärmpegel (dB)',
                     data: daten,
-                    borderColor: 'blue',
-                    borderWidth: 1.5,
-                    backgroundColor: 'rgba(0,0,255,0.08)',
+                    borderColor: '#1a74d6',
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
-                    tension: 0.1,
-                    pointRadius: 2,
-                    pointHoverRadius: 4
+                    tension: 0.3,
+                    pointRadius: 1.5,
+                    pointHoverRadius: 3,
+                    pointBackgroundColor: '#1a74d6'
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, labels.length),
-                    borderColor: 'green',
+                    borderColor: '#1bc13b',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -287,7 +282,7 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, labels.length),
-                    borderColor: 'orange',
+                    borderColor: '#e8a100',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -296,7 +291,7 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, labels.length),
-                    borderColor: 'red',
+                    borderColor: '#e13c3c',
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
@@ -306,11 +301,12 @@ function renderHistoricChart(labels, daten) {
         },
         options: {
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: { cornerRadius: 6 }
+                legend: { position: 'top' },
+                tooltip: { cornerRadius: 8, backgroundColor: '#fff', titleColor: '#333', bodyColor: '#333' }
             },
             scales: {
-                y: { min: 40, max: 100, title: {display:true, text:'dB'} }
+                x: { grid: { color: '#eee' }, ticks: { color: '#555' } },
+                y: { min: 40, max: 100, title: {display:true, text:'dB'}, grid: { color: '#eee' }, ticks: { color: '#555' } }
             }
         },
         plugins: [backgroundRangesPlugin]
@@ -320,7 +316,6 @@ function renderHistoricChart(labels, daten) {
 document.getElementById('von').addEventListener('change', () => {/* leer, keine auto-update */});
 document.getElementById('bis').addEventListener('change', () => {/* leer, keine auto-update */});
 
-// Beim Laden initialisieren
 ladePegelDaten();
 </script>
 </body>
