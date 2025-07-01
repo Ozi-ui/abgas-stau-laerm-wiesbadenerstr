@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <title>Für mehr Lebensqualität und Verkehrssicherheit!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Plotly CDN -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f6f8fb;
+      background: #f4f6fa;
       color: #222;
     }
     .container {
@@ -88,12 +88,6 @@
       line-height: 1.13;
     }
     ul, ol { margin-top: 0.18em; }
-    @media (max-width: 900px) {
-      .container { flex-direction: column; }
-      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
-      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
-      .blue-head { font-size: 1.2em; padding: 16px 10px; margin: -20px -2vw 24px -2vw;}
-    }
     .chart-section { margin: 28px 0 48px 0; }
     .chart-container {
       background: #f8fbff;
@@ -101,9 +95,14 @@
       padding: 22px 20px;
       margin-bottom: 23px;
       box-shadow: 0 2px 18px #0001;
-      max-width: 650px;
+      max-width: 700px;
     }
-    canvas { background: #fff; border-radius: 7px;}
+    @media (max-width: 900px) {
+      .container { flex-direction: column; }
+      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
+      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
+      .blue-head { font-size: 1.2em; padding: 16px 10px; margin: -20px -2vw 24px -2vw;}
+    }
     .spacer { height: 30px; }
   </style>
 </head>
@@ -113,15 +112,7 @@
     <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
     <ul>
       <li><a href="#laerm" class="active">Lärmmessung</a></li>
-      <li style="padding-left:18px;">
-        <a href="#laerm-grafik-1">Messung: Tagesverlauf</a>
-        <a href="#laerm-grafik-2">Messung: Wochenverlauf</a>
-      </li>
-      <li style="margin-top:1.4em;"><a href="#fahrzeuge">Fahrzeugaufkommen</a></li>
-      <li style="padding-left:18px;">
-        <a href="#fahrzeug-grafik-1">Fahrzeugarten</a>
-        <a href="#fahrzeug-grafik-2">Verlauf</a>
-      </li>
+      <li><a href="#fahrzeuge">Fahrzeugaufkommen</a></li>
     </ul>
   </nav>
   <div class="main">
@@ -168,135 +159,130 @@
     <div class="spacer"></div>
     <section class="chart-section" id="laerm">
       <h2>Lärmmessung</h2>
-      <div class="chart-container" id="laerm-grafik-1">
-        <h4>Tagesverlauf</h4>
-        <canvas id="laermChart1" width="600" height="260"></canvas>
+      <div class="chart-container">
+        <h4>Aktueller Lärmpegel</h4>
+        <div id="laermpegel-live" style="height:300px;"></div>
       </div>
-      <div class="chart-container" id="laerm-grafik-2">
-        <h4>Wochenverlauf</h4>
-        <canvas id="laermChart2" width="600" height="260"></canvas>
+      <div class="chart-container">
+        <h4>Historischer Lärmpegel</h4>
+        <div id="laermpegel-historic" style="height:300px;"></div>
       </div>
     </section>
     <section class="chart-section" id="fahrzeuge">
       <h2>Fahrzeugaufkommen</h2>
-      <div class="chart-container" id="fahrzeug-grafik-1">
-        <h4>Fahrzeugarten</h4>
-        <canvas id="fahrzeugChart1" width="600" height="260"></canvas>
-      </div>
-      <div class="chart-container" id="fahrzeug-grafik-2">
-        <h4>Verlauf</h4>
-        <canvas id="fahrzeugChart2" width="600" height="260"></canvas>
+      <div class="chart-container">
+        <h4>Balkendiagramm Fahrzeugarten</h4>
+        <div id="vehicle-bar" style="height:300px;"></div>
       </div>
     </section>
   </div>
 </div>
 <script>
-  // Lärmmessung Tagesverlauf (Beispielwerte)
-  new Chart(document.getElementById('laermChart1').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: ['0h','3h','6h','9h','12h','15h','18h','21h','24h'],
-      datasets: [{
-        label: 'dB(A) Pegel',
-        data: [49, 50, 52, 62, 70, 67, 65, 60, 55],
-        fill: true,
-        backgroundColor: 'rgba(33,118,255,0.10)',
-        borderColor: '#2176ff',
-        tension: 0.3,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { title: { display: true, text: 'Dezibel (dB)' }, min: 40, max: 80 },
-        x: { title: { display: true, text: 'Uhrzeit' } }
-      }
-    }
-  });
+  // Lärmmessung: Aktueller Pegel (letzte 5 Minuten)
+  async function loadLaermData() {
+    const res = await fetch('Daten/pegel.txt');
+    const txt = await res.text();
+    return txt.split('\n')
+      .map(l => {
+        const m = l.match(/^([\d\-]+ [\d:]+) - Maximaler Pegel: ([\d.]+) dB$/);
+        if(m) return {time: new Date(m[1]), value: parseFloat(m[2])};
+        return null;
+      })
+      .filter(x => x);
+  }
+  async function drawLaermLive() {
+    const data = await loadLaermData();
+    const tmax = data.length > 0 ? data[data.length-1].time : new Date();
+    const tmin = new Date(tmax.getTime() - 5*60000);
+    const live = data.filter(d => d.time >= tmin && d.time <= tmax);
+    const trace = {
+      x: live.map(d=>d.time),
+      y: live.map(d=>d.value),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Lärmpegel',
+      line: {color: '#2176ff'}
+    };
+    const layout = {
+      title: '',
+      xaxis: {title: 'Zeit'},
+      yaxis: {title: 'dB', range: [30, 100]},
+      margin: {t:20}
+    };
+    Plotly.newPlot('laermpegel-live', [trace], layout, {responsive:true});
+  }
+  setInterval(drawLaermLive, 5*60*1000);
+  drawLaermLive();
 
-  // Lärmmessung Wochenverlauf (Beispielwerte)
-  new Chart(document.getElementById('laermChart2').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['Mo','Di','Mi','Do','Fr','Sa','So'],
-      datasets: [{
-        label: 'Durchschn. dB(A)',
-        data: [62, 63, 66, 68, 70, 69, 60],
-        backgroundColor: 'rgba(33,118,255,0.7)',
-        borderColor: '#2176ff',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { title: { display: true, text: 'Dezibel (dB)' }, min: 50, max: 80 }
-      }
-    }
-  });
+  // Lärmmessung: Historisch (letzte 24h)
+  async function drawLaermHistoric() {
+    const data = await loadLaermData();
+    const to = data.length > 0 ? data[data.length-1].time : new Date();
+    const from = new Date(to.getTime() - 24*60*60000);
+    const filtered = data.filter(d => d.time >= from && d.time <= to);
+    const trace = {
+      x: filtered.map(d=>d.time),
+      y: filtered.map(d=>d.value),
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Lärmpegel',
+      line: {color: '#2176ff'}
+    };
+    const layout = {
+      title: '',
+      xaxis: {title: 'Zeit'},
+      yaxis: {title: 'dB', range: [30, 100]},
+      margin: {t:20}
+    };
+    Plotly.newPlot('laermpegel-historic', [trace], layout, {responsive:true});
+  }
+  drawLaermHistoric();
 
-  // Fahrzeugaufkommen (Beispielwerte, unterschiedlich farbig)
-  new Chart(document.getElementById('fahrzeugChart1').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: ['PKW', 'LKW', 'Motorräder', 'Fahrräder'],
-      datasets: [{
-        label: 'Anzahl',
-        data: [120, 30, 45, 60],
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.85)',   // PKW - Blau
-          'rgba(255, 99, 132, 0.85)',   // LKW - Rot
-          'rgba(255, 206, 86, 0.85)',   // Motorräder - Gelb
-          'rgba(75, 192, 192, 0.85)'    // Fahrräder - Grün
-        ],
-        borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 99, 132, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)'
-        ],
-        borderWidth: 2
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Anzahl' } }
-      }
-    }
-  });
-
-  // Fahrzeugaufkommen Verlauf (Beispielwerte)
-  new Chart(document.getElementById('fahrzeugChart2').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: ['0h','3h','6h','9h','12h','15h','18h','21h','24h'],
-      datasets: [{
-        label: 'Fahrzeuge gesamt',
-        data: [15, 20, 25, 55, 80, 75, 60, 40, 20],
-        fill: false,
-        borderColor: '#ff9900',
-        tension: 0.32,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Fahrzeuge/h' } },
-        x: { title: { display: true, text: 'Uhrzeit' } }
-      }
-    }
-  });
-
-  // Navigation - active link highlight
-  document.querySelectorAll('nav a').forEach(link => {
-    link.addEventListener('click', function() {
-      document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
+  // Fahrzeugaufkommen: Balkendiagramm mit Farben
+  async function loadVehicleData() {
+    const res = await fetch('Daten/vehicle_counts.txt');
+    const txt = await res.text();
+    return txt.split('\n')
+      .map(l => {
+        const m = l.match(/^([\d\-]+),\s*([\d:]+),\s*(\w+)/);
+        if(m) return {time: new Date(m[1] + 'T' + m[2]), type: m[3]};
+        return null;
+      })
+      .filter(x => x);
+  }
+  async function drawVehicleBar() {
+    const data = await loadVehicleData();
+    // Zeige letzten Tag
+    const to = data.length > 0 ? data[data.length-1].time : new Date();
+    const from = new Date(to.getTime() - 24*60*60000);
+    const filtered = data.filter(d => d.time >= from && d.time <= to);
+    const types = ['PKW', 'LKW', 'Motorrad', 'Fahrrad'];
+    const farben = [
+      'rgba(54, 162, 235, 0.8)',   // PKW
+      'rgba(255, 99, 132, 0.8)',   // LKW
+      'rgba(255, 206, 86, 0.8)',   // Motorrad
+      'rgba(75, 192, 192, 0.8)'    // Fahrrad
+    ];
+    const counts = types.map(type =>
+      filtered.filter(d => d.type.toLowerCase().includes(type.toLowerCase())).length
+    );
+    const trace = {
+      x: types,
+      y: counts,
+      type: 'bar',
+      marker: {color: farben},
+      text: counts.map(String),
+      textposition: 'auto'
+    };
+    const layout = {
+      title: '',
+      xaxis: {title: 'Fahrzeugtyp'},
+      yaxis: {title: 'Anzahl', rangemode:'tozero'},
+      margin: {t:20}
+    };
+    Plotly.newPlot('vehicle-bar', [trace], layout, {responsive:true});
+  }
+  drawVehicleBar();
 </script>
 </body>
 </html>
