@@ -45,7 +45,8 @@ async function fetchPegelDaten() {
     const labels = [];
     const daten = [];
     lines.forEach(line => {
-        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([0-9.]+) dB$/);
+        // Angepasst: Erkennt sowohl "Maximaler Pegel" als auch "Aktueller Pegel"
+        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
         if (match) {
             labels.push(match[1]);
             daten.push(parseFloat(match[2]));
