@@ -1,91 +1,195 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Fahrzeugaufkommen – Nachbarschaft Lärmschutz Wiesbadener Straße</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-    .container { display: flex; min-height: 100vh; }
-    nav { background: #1758a5; color: #fff; min-width: 240px; padding: 0 0 40px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
-    nav h1 { font-size: 1.3em; font-weight: 700; line-height: 1.2; padding: 24px 16px 18px 16px; margin: 0 0 14px 0; }
-    nav ul { list-style: none; padding: 0; margin: 0; }
-    nav li { margin-bottom: 10px; }
-    nav a { color: #fff; text-decoration: none; display: block; padding: 12px 16px; font-weight: 600; border-radius: 4px 0 0 4px; transition: background 0.2s; }
-    nav a.active, nav a:hover { background-color: #0e4080; }
-    .nav-sub { font-size: 0.97em; padding-left: 19px; color: #b5d8ff; }
-    .main { flex: 1; padding: 40px 40px 40px 40px; background: #fff; border-radius: 0 10px 10px 0; }
-    .blue-head { background: #1758a5; color: #fff; padding: 20px 18px; border-radius: 8px; margin-bottom: 28px; font-size: 1.3em; font-weight: 600; }
-    .chart-section { margin-bottom: 38px;}
-    .chart-container { background: #f9fbfe; padding: 18px 18px 8px 18px; border-radius: 8px; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(23,88,165,0.03);}
-    .chart-controls { margin-bottom: 10px; font-size: 0.98em;}
-    .chart-controls label, .chart-controls select, .chart-controls input, .chart-controls button { margin-right: 10px; margin-bottom: 4px;}
-    @media (max-width: 900px) {
-      .container { flex-direction: column; }
-      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
-      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
-      .blue-head { font-size: 1.2em; padding: 16px 10px; margin: -20px -2vw 24px -2vw;}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Fahrzeugzählung</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
+        #container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+        h1 { margin-bottom: 30px; }
+        .chart-block { margin-bottom: 60px; }
+    </style>
 </head>
 <body>
-<div class="container">
-  <nav>
-    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
-    <ul>
-      <li>
-        <a href="index.html">Startseite</a>
-      </li>
-      <li>
-        <a href="laerm.html">Lärmmessung</a>
-        <div class="nav-sub">
-          <div>• Aktuelle Lärmpegel</div>
-          <div>• Historische Lärmpegel</div>
-        </div>
-      </li>
-      <li>
-        <a href="fahrzeuge.html" class="active">Fahrzeugaufkommen</a>
-        <div class="nav-sub">
-          <div>• Aktuelles Fahrzeugaufkommen (1h)</div>
-          <div>• Historisches Fahrzeugaufkommen</div>
-          <div>• Balkendiagramm Fahrzeugaufkommen</div>
-        </div>
-      </li>
-    </ul>
-  </nav>
-  <div class="main">
-    <div class="blue-head">
-      Fahrzeugaufkommen
+<div id="container">
+    <h1>Fahrzeugzählung</h1>
+    <div class="chart-block">
+        <h2>Fahrzeugaufkommen nach Typ</h2>
+        <canvas id="fahrzeug-balken" height="80"></canvas>
     </div>
-    <section class="chart-section" id="fahrzeuge">
-      <div class="chart-container">
-        <h4>Balkendiagramm Fahrzeugarten (letzte Stunde)</h4>
-        <div id="vehicle-bar" style="height:300px;"></div>
-      </div>
-      <div class="chart-container">
-        <h4>Historisches Fahrzeugaufkommen</h4>
-        <div class="chart-controls">
-          <label>Zeitraum:
-            <select id="vehicle-historic-interval" onchange="drawVehicleHistoric()">
-              <option value="10">Letzte 10 Minuten</option>
-              <option value="20">Letzte 20 Minuten</option>
-              <option value="30">Letzte 30 Minuten</option>
-              <option value="60">Letzte 1 Stunde</option>
-              <option value="720">Letzte 12 Stunden</option>
-              <option value="1440" selected>Letzte 24 Stunden</option>
-            </select>
-          </label>
-          <label>Von: <input type="datetime-local" id="vehicle-historic-from"></label>
-          <label>Bis: <input type="datetime-local" id="vehicle-historic-to"></label>
-          <button onclick="drawVehicleHistoricCustom()">Anzeigen</button>
-        </div>
-        <div id="vehicle-historic" style="height:300px;"></div>
-      </div>
-    </section>
-  </div>
+    <div class="chart-block">
+        <h2>Fahrzeugdichte im Zeitverlauf</h2>
+        Zeitraum:
+        <select id="zeitraum">
+            <option value="10">Letzte 10 Minuten</option>
+            <option value="30">Letzte 30 Minuten</option>
+            <option value="60">Letzte 60 Minuten</option>
+            <option value="all">Alles</option>
+        </select>
+        <button onclick="ladeFahrzeugDaten()">Aktualisieren</button>
+        <canvas id="fahrzeug-linie" height="80"></canvas>
+    </div>
 </div>
+
 <script>
-// Dein bestehender JS-Code bleibt hier
+const farben = {
+    'Auto': 'steelblue',
+    'Bus': 'orange',
+    'LKW': 'green',
+    'Motorrad': 'purple',
+    'Kleintransporter': 'red'
+};
+
+let alleEintraege = [];
+
+async function fetchFahrzeugDaten() {
+    const response = await fetch('Daten/vehicle_counts.txt');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    let data = [];
+    lines.forEach(line => {
+        // Format: 2025-06-12, 14:00:31, Auto
+        const match = line.match(/^(\d{4}-\d{2}-\d{2}),\s*(\d{2}:\d{2}:\d{2}),\s*(\w+)$/);
+        if (match) {
+            const datum = match[1];
+            const zeit = match[2];
+            const typ = match[3];
+            const datetime = new Date(datum + "T" + zeit);
+            data.push({ datetime, typ });
+        }
+    });
+    return data;
+}
+
+function gruppiereNachTyp(data) {
+    // {Auto: 10, Bus: 2, ...}
+    const counts = {};
+    data.forEach(e => {
+        counts[e.typ] = (counts[e.typ] || 0) + 1;
+    });
+    return counts;
+}
+
+function gruppiereZeitverlauf(data, intervalMinuten = 1, filterTypen=[]) {
+    // Gibt: {timeLabel: {Auto: x, Bus: y, ...}}
+    let result = {};
+    if (data.length === 0) return result;
+    // Nur gefilterte Typen (falls gesetzt)
+    if (filterTypen.length > 0) {
+        data = data.filter(e => filterTypen.includes(e.typ));
+    }
+    // Finde früheste und späteste Zeit
+    data.sort((a,b) => a.datetime-b.datetime);
+    const start = new Date(data[0].datetime);
+    const end = new Date(data[data.length-1].datetime);
+    // Zeitstempel für jede Zeiteinheit
+    for(let t = new Date(start); t <= end; t.setMinutes(t.getMinutes()+intervalMinuten)) {
+        const label = t.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        result[label] = {};
+        for(const typ of Object.keys(farben)) result[label][typ]=0;
+    }
+    // Einträge jeweils zuordnen
+    data.forEach(e => {
+        // Finde Zeitfenster
+        let t = new Date(e.datetime);
+        t.setSeconds(0,0);
+        if (intervalMinuten > 1) t.setMinutes(Math.floor(t.getMinutes()/intervalMinuten)*intervalMinuten);
+        const label = t.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        if (!result[label]) {
+            // Kann vorkommen bei Zeitfilter, dann ergänzen
+            result[label] = {};
+            for(const typ of Object.keys(farben)) result[label][typ]=0;
+        }
+        result[label][e.typ] = (result[label][e.typ]||0) + 1;
+    });
+    return result;
+}
+
+let balkenChart, linienChart;
+
+async function ladeFahrzeugDaten() {
+    // Filter nach Zeitraum
+    alleEintraege = await fetchFahrzeugDaten();
+
+    // --- 1. Fahrzeugaufkommen nach Typ ---
+    const counts = gruppiereNachTyp(alleEintraege);
+    const labels = Object.keys(farben).filter(typ => counts[typ]);
+    const daten = labels.map(typ => counts[typ]||0);
+    const chartdata = {
+        labels: labels,
+        datasets: [{
+            label: 'Anzahl',
+            data: daten,
+            backgroundColor: labels.map(typ=>farben[typ]||'gray')
+        }]
+    };
+    if (balkenChart) balkenChart.destroy();
+    balkenChart = new Chart(document.getElementById('fahrzeug-balken').getContext('2d'), {
+        type: 'bar',
+        data: chartdata,
+        options: {
+            plugins: {
+                legend: {display: false},
+                tooltip: {enabled: true}
+            },
+            scales: {
+                y: {beginAtZero:true, title:{display:true, text:'Anzahl'}}
+            }
+        }
+    });
+
+    // --- 2. Zeitverlauf (nach gewähltem Zeitraum) ---
+    updateLinienDiagramm();
+}
+
+function updateLinienDiagramm() {
+    let zeitraum = document.getElementById('zeitraum').value;
+    let gefiltert = [];
+    if (zeitraum === 'all') {
+        gefiltert = alleEintraege;
+    } else {
+        const minuten = parseInt(zeitraum);
+        const grenze = new Date(Date.now() - minuten*60000);
+        gefiltert = alleEintraege.filter(e => e.datetime >= grenze);
+    }
+    // Gruppieren: 1-Minuten-Intervalle
+    const interval = (zeitraum === 'all' ? 10 : 1); // bei "alle" gröber samplen
+    const verlauf = gruppiereZeitverlauf(gefiltert, interval);
+    const labels = Object.keys(verlauf);
+    const datensaetze = Object.keys(farben).map(typ => ({
+        label: typ,
+        data: labels.map(l=>verlauf[l][typ]||0),
+        borderColor: farben[typ],
+        backgroundColor: farben[typ],
+        fill: false,
+        tension: 0.1
+    }));
+
+    if (linienChart) linienChart.destroy();
+    linienChart = new Chart(document.getElementById('fahrzeug-linie').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datensaetze
+        },
+        options: {
+            plugins: {
+                legend: {position: 'top'},
+                tooltip: {enabled:true}
+            },
+            scales: {
+                y: {beginAtZero:true, title:{display:true, text:'Anzahl'}}
+            }
+        }
+    });
+}
+
+// Eventlistener für Zeitraum
+document.getElementById('zeitraum').addEventListener('change', updateLinienDiagramm);
+
+// Beim Laden initialisieren
+ladeFahrzeugDaten();
 </script>
 </body>
 </html>
