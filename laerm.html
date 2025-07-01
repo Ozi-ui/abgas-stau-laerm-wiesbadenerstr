@@ -34,10 +34,35 @@
 </div>
 
 <script>
+// Chart.js Plugin für farbige Schwellenbereiche (ähnlich Plotly shapes)
+const backgroundRangesPlugin = {
+    id: 'backgroundRanges',
+    beforeDatasetsDraw: (chart) => {
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea) return;
+        // Bereiche: [unten, oben, Farbe, Opazität]
+        const ranges = [
+            [40, 55, 'green', 0.12],
+            [55, 65, 'yellow', 0.13],
+            [65, 70, 'orange', 0.13],
+            [70, 80, 'red', 0.11]
+        ];
+        ranges.forEach(([yMin, yMax, color, alpha]) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            // Bereich in Pixel umrechnen (y0/y1 in px)
+            const y0 = scales.y.getPixelForValue(yMax);
+            const y1 = scales.y.getPixelForValue(yMin);
+            ctx.fillRect(chartArea.left, y0, chartArea.right - chartArea.left, y1 - y0);
+            ctx.restore();
+        });
+    }
+};
+
 let alleLabels = [];
 let alleDaten = [];
 
-// Hilfsfunktion: pegel.txt laden und parsen
 async function fetchPegelDaten() {
     const response = await fetch('Daten/pegel.txt');
     const text = await response.text();
@@ -45,7 +70,6 @@ async function fetchPegelDaten() {
     const labels = [];
     const daten = [];
     lines.forEach(line => {
-        // Angepasst: Erkennt sowohl "Maximaler Pegel" als auch "Aktueller Pegel"
         const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
         if (match) {
             labels.push(match[1]);
@@ -55,7 +79,6 @@ async function fetchPegelDaten() {
     return {labels, daten};
 }
 
-// WHO-Linien generieren
 function genGrenzwertArray(wert, len) {
     return Array(len).fill(wert);
 }
@@ -69,7 +92,7 @@ async function ladePegelDaten() {
     alleDaten = daten;
 
     // Live: letzte 10 Werte (ca. 5 Minuten bei 30s-Takt)
-    const liveLabels = labels.slice(-10).map(l => l.substring(11)); // Nur Uhrzeit
+    const liveLabels = labels.slice(-10).map(l => l.substring(11));
     const liveDaten = daten.slice(-10);
 
     if (liveChart) liveChart.destroy();
@@ -113,10 +136,14 @@ async function ladePegelDaten() {
             ]
         },
         options: {
+            plugins: {
+                legend: { position: 'top' }
+            },
             scales: {
                 y: { min: 40, max: 80, title: {display:true, text:'dB'} }
             }
-        }
+        },
+        plugins: [backgroundRangesPlugin]
     });
 
     updateHistoricChart();
@@ -174,10 +201,14 @@ function updateHistoricChart() {
             ]
         },
         options: {
+            plugins: {
+                legend: { position: 'top' }
+            },
             scales: {
                 y: { min: 40, max: 80, title: {display:true, text:'dB'} }
             }
-        }
+        },
+        plugins: [backgroundRangesPlugin]
     });
 }
 
