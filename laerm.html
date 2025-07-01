@@ -147,6 +147,26 @@ let alleDaten = [];
 let alleRawLabels = [];
 let alleRawDaten = [];
 
+// Aggregiert Werte über einen festen Zeitraum (z.B. 60 Minuten)
+function aggregateData(labels, daten, intervalMinutes = 60) {
+    const aggregated = {};
+    labels.forEach((label, i) => {
+        const date = new Date(label.replace(' ', 'T'));
+        date.setMinutes(Math.floor(date.getMinutes() / intervalMinutes) * intervalMinutes, 0, 0);
+        const key = date.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+        if (!aggregated[key]) aggregated[key] = [];
+        aggregated[key].push(daten[i]);
+    });
+    // Aggregation: Durchschnitt pro Intervall
+    const resultLabels = [];
+    const resultData = [];
+    Object.entries(aggregated).forEach(([key, values]) => {
+        resultLabels.push(key.replace('T', ' '));
+        resultData.push(values.reduce((a, b) => a + b) / values.length);
+    });
+    return {labels: resultLabels, daten: resultData};
+}
+
 async function fetchPegelDaten() {
     const response = await fetch('Daten/pegel.txt');
     const text = await response.text();
@@ -176,6 +196,7 @@ function setZeitraumPreset(minuten) {
     updateHistoricChartPreset(parseInt(minuten));
 }
 
+// NEU: Aggregation bei großen Zeiträumen integriert!
 function updateHistoricChartPreset(minuten) {
     const now = new Date();
     const msBack = minuten * 60 * 1000;
@@ -192,11 +213,17 @@ function updateHistoricChartPreset(minuten) {
     let labels = [];
     let daten = [];
     if (filteredIdx.length > 0) {
-        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        labels = filteredIdx.map(i => alleRawLabels[i]);
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
 
-    renderHistoricChart(labels, daten);
+    // Aggregiere automatisch bei größeren Zeitfenstern
+    let agg = {labels, daten};
+    if (labels.length > 100) {
+        // Aggregiere auf 60-Minuten-Mittelwerte, wenn mehr als 100 Punkte vorhanden
+        agg = aggregateData(labels, daten, 60);
+    }
+    renderHistoricChart(agg.labels, agg.daten);
 }
 
 function zeitraumVonBis() {
@@ -220,11 +247,17 @@ function zeitraumVonBis() {
     let labels = [];
     let daten = [];
     if (filteredIdx.length > 0) {
-        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        labels = filteredIdx.map(i => alleRawLabels[i]);
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
 
-    renderHistoricChart(labels, daten);
+    // Aggregiere automatisch bei langen Zeiträumen
+    let agg = {labels, daten};
+    if (labels.length > 100) {
+        // Aggregiere auf 60-Minuten-Mittelwerte, wenn mehr als 100 Punkte vorhanden
+        agg = aggregateData(labels, daten, 60);
+    }
+    renderHistoricChart(agg.labels, agg.daten);
 }
 
 async function ladePegelDaten() {
@@ -300,6 +333,7 @@ async function ladePegelDaten() {
     updateHistoricChartPreset(10);
 }
 
+// ACHSE: bessere Beschriftung
 function renderHistoricChart(labels, daten) {
     if (historicChart) historicChart.destroy();
     historicChart = new Chart(document.getElementById('laermpegel-historic').getContext('2d'), {
@@ -350,11 +384,34 @@ function renderHistoricChart(labels, daten) {
         options: {
             plugins: {
                 legend: { position: 'bottom' },
-                tooltip: { cornerRadius: 6, enabled: true, mode: 'index', intersect: false }
+                tooltip: {
+                    cornerRadius: 6,
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        }
+                    }
+                }
             },
             scales: {
                 y: { min: 40, max: 100, title: {display:true, text:'dB'}, ticks: { stepSize: 5 } },
-                x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 30 } }
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: 12,
+                        callback: function(val, idx, values) {
+                            const label = this.getLabelForValue(val);
+                            if (label.length > 5) {
+                                // z.B. "06-30 13:00"
+                                return label.slice(5, 10) + "\n" + label.slice(11, 16);
+                            }
+                            return label;
+                        }
+                    }
+                }
             }
         },
         plugins: [backgroundRangesPlugin]
