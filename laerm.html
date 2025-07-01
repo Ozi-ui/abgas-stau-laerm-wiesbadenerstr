@@ -9,11 +9,28 @@
         h2 { margin-top: 40px; }
         #container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
         .chart-block { margin-bottom: 50px; }
-        .input-row { margin-bottom: 15px; }
+        .input-row { margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap;}
+        .nav { margin-bottom: 30px; background: #224e7a; color: #fff; padding: 14px 24px; border-radius: 6px;}
+        .nav a { color: #fff; margin-right: 30px; text-decoration: none; font-weight: bold;}
+        .nav a:hover { text-decoration: underline; }
+        .input-row label { margin-right: 8px; }
+        .btn-group button {margin-right: 8px;}
+        @media (max-width: 600px) {
+            #container { padding: 5vw; }
+            .input-row { flex-direction: column; align-items: stretch;}
+            .btn-group { margin: 10px 0;}
+        }
     </style>
 </head>
 <body>
 <div id="container">
+    <div class="nav">
+        <a href="index.html">Start</a>
+        <a href="laerm.html">Lärmpegel</a>
+        <a href="abgas.html">Abgas</a>
+        <a href="stau.html">Stau</a>
+        <!-- weitere Links je nach Bedarf -->
+    </div>
     <h1>Lärmpegel Monitoring</h1>
 
     <div class="chart-block">
@@ -25,9 +42,20 @@
     <div class="chart-block">
         <h2>Historische Lärmpegel-Auswertung</h2>
         <div class="input-row">
-            Zeitraum: 
-            <input type="number" id="zeitraum" min="1" max="1000" value="10" style="width:60px;"> Minuten zurück
-            <button onclick="ladePegelDaten()">Aktualisieren</button>
+            <div class="btn-group">
+                <button onclick="setZeitraumPreset(10)">10 Min</button>
+                <button onclick="setZeitraumPreset(30)">30 Min</button>
+                <button onclick="setZeitraumPreset(60)">1 Stunde</button>
+                <button onclick="setZeitraumPreset(360)">6 Stunden</button>
+                <button onclick="setZeitraumPreset(720)">12 Stunden</button>
+                <button onclick="setZeitraumPreset(1440)">24 Stunden</button>
+            </div>
+            <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
+            <label for="von">von:</label>
+            <input type="datetime-local" id="von" style="margin-right:8px;">
+            <label for="bis">bis:</label>
+            <input type="datetime-local" id="bis" style="margin-right:8px;">
+            <button onclick="zeitraumVonBis()">Anwenden</button>
         </div>
         <canvas id="laermpegel-historic" height="80"></canvas>
     </div>
@@ -62,6 +90,8 @@ const backgroundRangesPlugin = {
 
 let alleLabels = [];
 let alleDaten = [];
+let alleRawLabels = []; // für Zeitfilter
+let alleRawDaten = [];
 
 async function fetchPegelDaten() {
     const response = await fetch('Daten/pegel.txt');
@@ -70,9 +100,10 @@ async function fetchPegelDaten() {
     const labels = [];
     const daten = [];
     lines.forEach(line => {
-        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
+        // Nur Jahr-Monat-Tag Stunde:Minute extrahieren, Sekunden werden ignoriert
+        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2} - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
         if (match) {
-            labels.push(match[1]);
+            labels.push(match[1]); // 'YYYY-MM-DD HH:MM'
             daten.push(parseFloat(match[2]));
         }
     });
@@ -86,14 +117,83 @@ function genGrenzwertArray(wert, len) {
 let liveChart;
 let historicChart;
 
+// Zeitauswahl-Helper
+function setZeitraumPreset(minuten) {
+    // Setzt die letzten X Minuten als Filter
+    document.getElementById('von').value = '';
+    document.getElementById('bis').value = '';
+    updateHistoricChartPreset(minuten);
+}
+
+function updateHistoricChartPreset(minuten) {
+    // Zeigt die letzten X Minuten an
+    const now = new Date();
+    const msBack = minuten * 60 * 1000;
+    const timeBack = new Date(now.getTime() - msBack);
+
+    // alleRawLabels ist Array aus 'YYYY-MM-DD HH:MM'
+    // Wir suchen Entries >= timeBack bis zum aktuellsten (letzter Wert)
+    const filteredIdx = alleRawLabels
+        .map((label, idx) => ({label, idx}))
+        .filter(obj => {
+            // label: 'YYYY-MM-DD HH:MM' -> 'YYYY-MM-DDTHH:MM'
+            const d = new Date(obj.label.replace(' ', 'T'));
+            return d >= timeBack;
+        })
+        .map(obj => obj.idx);
+
+    let labels = [];
+    let daten = [];
+    if (filteredIdx.length > 0) {
+        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        daten = filteredIdx.map(i => alleRawDaten[i]);
+    }
+
+    renderHistoricChart(labels, daten);
+}
+
+function zeitraumVonBis() {
+    // Holt Werte zwischen von und bis
+    const von = document.getElementById('von').value;
+    const bis = document.getElementById('bis').value;
+    if (!von || !bis) {
+        alert("Bitte 'von' und 'bis' Datum/Zeit wählen.");
+        return;
+    }
+    // von und bis sind im Format "YYYY-MM-DDTHH:MM"
+    // alleRawLabels sind "YYYY-MM-DD HH:MM"
+    // Wir ersetzen das ' ' durch 'T' zum Vergleich
+    const vonDate = new Date(von);
+    const bisDate = new Date(bis);
+
+    const filteredIdx = alleRawLabels
+        .map((label, idx) => ({label, idx}))
+        .filter(obj => {
+            const d = new Date(obj.label.replace(' ', 'T'));
+            return d >= vonDate && d <= bisDate;
+        })
+        .map(obj => obj.idx);
+
+    let labels = [];
+    let daten = [];
+    if (filteredIdx.length > 0) {
+        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        daten = filteredIdx.map(i => alleRawDaten[i]);
+    }
+
+    renderHistoricChart(labels, daten);
+}
+
 async function ladePegelDaten() {
     const { labels, daten } = await fetchPegelDaten();
-    alleLabels = labels;
-    alleDaten = daten;
+    alleLabels = labels.slice(-10); // Für Live-Chart: letzte 10
+    alleDaten = daten.slice(-10);
+    alleRawLabels = labels;
+    alleRawDaten = daten;
 
     // Live: letzte 10 Werte (ca. 5 Minuten bei 30s-Takt)
-    const liveLabels = labels.slice(-10).map(l => l.substring(11));
-    const liveDaten = daten.slice(-10);
+    const liveLabels = alleLabels.map(l => l.substring(11));
+    const liveDaten = alleDaten;
 
     if (liveChart) liveChart.destroy();
     liveChart = new Chart(document.getElementById('laermpegel-live').getContext('2d'), {
@@ -153,15 +253,11 @@ async function ladePegelDaten() {
         plugins: [backgroundRangesPlugin]
     });
 
-    updateHistoricChart();
+    // Standard: Letzte 10 Minuten
+    updateHistoricChartPreset(10);
 }
 
-function updateHistoricChart() {
-    const zeitraum = parseInt(document.getElementById('zeitraum').value) || 10;
-    const len = Math.min(zeitraum, alleLabels.length);
-    const labels = alleLabels.slice(-len).map(l => l.substring(11));
-    const daten = alleDaten.slice(-len);
-
+function renderHistoricChart(labels, daten) {
     if (historicChart) historicChart.destroy();
     historicChart = new Chart(document.getElementById('laermpegel-historic').getContext('2d'), {
         type: 'line',
@@ -221,7 +317,8 @@ function updateHistoricChart() {
     });
 }
 
-document.getElementById('zeitraum').addEventListener('change', updateHistoricChart);
+document.getElementById('von').addEventListener('change', () => {/* leer, keine auto-update */});
+document.getElementById('bis').addEventListener('change', () => {/* leer, keine auto-update */});
 
 // Beim Laden initialisieren
 ladePegelDaten();
