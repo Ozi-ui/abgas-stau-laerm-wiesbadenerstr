@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<div id="laermpegel"></div>
+<script>
+const daten = [
+    {x: ['2025-07-01 21:03:44', '2025-07-01 21:03:45', '2025-07-01 21:03:46'], y: [64.44, 65.78, 65.49], mode: 'lines', name: 'Lärmpegel (dB)', line: {color: 'blue'}}
+];
+const shapes = [
+    // Schwellen-Bereiche farbig hinterlegen wie axhspan
+    {type: 'rect', yref: 'y', y0: 20, y1: 55, xref: 'paper', x0: 0, x1: 1, fillcolor: 'green', opacity: 0.1, line: {width: 0}},
+    {type: 'rect', yref: 'y', y0: 55, y1: 65, xref: 'paper', x0: 0, x1: 1, fillcolor: 'yellow', opacity: 0.15, line: {width: 0}},
+    {type: 'rect', yref: 'y', y0: 65, y1: 70, xref: 'paper', x0: 0, x1: 1, fillcolor: 'orange', opacity: 0.15, line: {width: 0}},
+    {type: 'rect', yref: 'y', y0: 70, y1: 100, xref: 'paper', x0: 0, x1: 1, fillcolor: 'red', opacity: 0.12, line: {width: 0}}
+];
+const layout = {
+    title: "Lärmpegel mit WHO-Schwellen",
+    yaxis: {range: [20, 100], title: 'dB'},
+    xaxis: {title: 'Zeit', tickangle: -45},
+    shapes: shapes,
+    legend: {x: 1.05, y: 1}
+};
+Plotly.newPlot('laermpegel', daten, layout);
+</script>
+</body>
+</html>
