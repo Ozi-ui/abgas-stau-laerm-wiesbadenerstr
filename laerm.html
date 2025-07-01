@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lärmpegel-Auswertung</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
+        h2 { margin-top: 40px; }
+        #container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
+        .chart-block { margin-bottom: 50px; }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Lärmpegel Monitoring</h1>
+    <div class="chart-block">
+        <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
+        <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
+        <canvas id="laermpegel-live" height="80"></canvas>
+    </div>
+    <div class="chart-block">
+        <h2>Historische Lärmpegel-Auswertung</h2>
+        Zeitraum: 
+        <select id="zeitraum">
+            <option value="10">Letzte 10 Minuten</option>
+            <option value="30">Letzte 30 Minuten</option>
+            <option value="60">Letzte 60 Minuten</option>
+            <option value="all">Alles</option>
+        </select>
+        <button onclick="ladePegelDaten()">Aktualisieren</button>
+        <canvas id="laermpegel-historic" height="80"></canvas>
+    </div>
+</div>
+
+<script>
+let alleLabels = [];
+let alleDaten = [];
+
+// Hilfsfunktion: pegel.txt laden und parsen
+async function fetchPegelDaten() {
+    const response = await fetch('Daten/pegel.txt');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    const labels = [];
+    const daten = [];
+    lines.forEach(line => {
+        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - Maximaler Pegel: ([0-9.]+) dB$/);
+        if (match) {
+            labels.push(match[1]);
+            daten.push(parseFloat(match[2]));
+        }
+    });
+    return {labels, daten};
+}
+
+// WHO-Linien generieren
+function genGrenzwertArray(wert, len) {
+    return Array(len).fill(wert);
+}
+
+let liveChart;
+let historicChart;
+
+async function ladePegelDaten() {
+    const { labels, daten } = await fetchPegelDaten();
+    alleLabels = labels;
+    alleDaten = daten;
+
+    // Live: letzte 10 Werte (ca. 5 Minuten bei 30s-Takt)
+    const liveLabels = labels.slice(-10).map(l => l.substring(11)); // Nur Uhrzeit
+    const liveDaten = daten.slice(-10);
+
+    if (liveChart) liveChart.destroy();
+    liveChart = new Chart(document.getElementById('laermpegel-live').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: liveLabels,
+            datasets: [
+                {
+                    label: 'Lärmpegel (dB)',
+                    data: liveDaten,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,255,0.10)',
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'WHO Empfehlung (55 dB)',
+                    data: genGrenzwertArray(55, liveLabels.length),
+                    borderColor: 'green',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO kritisch (65 dB)',
+                    data: genGrenzwertArray(65, liveLabels.length),
+                    borderColor: 'orange',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO gesundheitsschädlich (70 dB)',
+                    data: genGrenzwertArray(70, liveLabels.length),
+                    borderColor: 'red',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: { min: 40, max: 80, title: {display:true, text:'dB'} }
+            }
+        }
+    });
+
+    updateHistoricChart();
+}
+
+function updateHistoricChart() {
+    const zeitraum = document.getElementById('zeitraum').value;
+    let labels, daten;
+    if (zeitraum === 'all') {
+        labels = alleLabels.map(l => l.substring(11));
+        daten = alleDaten;
+    } else {
+        const len = parseInt(zeitraum);
+        labels = alleLabels.slice(-len).map(l => l.substring(11));
+        daten = alleDaten.slice(-len);
+    }
+    if (historicChart) historicChart.destroy();
+    historicChart = new Chart(document.getElementById('laermpegel-historic').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Lärmpegel (dB)',
+                    data: daten,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,255,0.10)',
+                    fill: true,
+                    tension: 0.1
+                },
+                {
+                    label: 'WHO Empfehlung (55 dB)',
+                    data: genGrenzwertArray(55, labels.length),
+                    borderColor: 'green',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO kritisch (65 dB)',
+                    data: genGrenzwertArray(65, labels.length),
+                    borderColor: 'orange',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'WHO gesundheitsschädlich (70 dB)',
+                    data: genGrenzwertArray(70, labels.length),
+                    borderColor: 'red',
+                    borderDash: [4,4],
+                    pointRadius: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: { min: 40, max: 80, title: {display:true, text:'dB'} }
+            }
+        }
+    });
+}
+
+document.getElementById('zeitraum').addEventListener('change', updateHistoricChart);
+
+// Beim Laden initialisieren
+ladePegelDaten();
+</script>
+</body>
+</html>
