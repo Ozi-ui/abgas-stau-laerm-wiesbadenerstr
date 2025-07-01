@@ -6,29 +6,46 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
+        h2 { margin-top: 40px; }
         #container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 8px #ccc; }
         h1 { margin-bottom: 30px; }
-        .chart-block { margin-bottom: 60px; }
+        .chart-block { margin-bottom: 50px; }
+        canvas { height: 400px !important; width: 100% !important; }
+        .input-group { margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .input-group label { white-space: nowrap; }
+        .input-group input[type="datetime-local"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .input-group button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .input-group button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
 <div id="container">
     <h1>Fahrzeugzählung</h1>
+    
     <div class="chart-block">
-        <h2>Fahrzeugaufkommen nach Typ</h2>
-        <canvas id="fahrzeug-balken" height="80"></canvas>
+        <h2 id="balken-chart-title">Fahrzeugaufkommen nach Typ</h2> 
+        <canvas id="fahrzeug-balken"></canvas>
     </div>
+
     <div class="chart-block">
         <h2>Fahrzeugdichte im Zeitverlauf</h2>
-        Zeitraum:
-        <select id="zeitraum">
-            <option value="10">Letzte 10 Minuten</option>
-            <option value="30">Letzte 30 Minuten</option>
-            <option value="60">Letzte 60 Minuten</option>
-            <option value="all">Alles</option>
-        </select>
-        <button onclick="ladeFahrzeugDaten()">Aktualisieren</button>
-        <canvas id="fahrzeug-linie" height="80"></canvas>
+        Zeitraum-Voreinstellung: 
+        <select id="zeitraum-preset">
+            <option value="last10min">Letzte 10 Minuten</option>
+            <option value="last30min">Letzte 30 Minuten</option>
+            <option value="last60min">Letzte 60 Minuten</option>
+            <option value="last12h">Letzte 12 Stunden</option>
+            <option value="last24h">Letzte 24 Stunden</option>
+            <option value="all" selected>Gesamter Verlauf</option> </select>
+        <button onclick="applyFilters()">Anzeigen</button> <div class="input-group">
+            <label for="von-datum-zeit">Von:</label>
+            <input type="datetime-local" id="von-datum-zeit">
+            <label for="bis-datum-zeit">Bis:</label>
+            <input type="datetime-local" id="bis-datum-zeit">
+            <button onclick="applyFilters()">Filter anwenden</button> 
+        </div>
+        
+        <canvas id="fahrzeug-linie"></canvas>
     </div>
 </div>
 
@@ -37,15 +54,21 @@
 const backgroundRangesPlugin = {
     id: 'backgroundRanges',
     beforeDatasetsDraw: (chart) => {
+        // Sicherstellen, dass das Plugin nur auf dem Linien-Chart angewendet wird
+        if (chart.canvas.id !== 'fahrzeug-linie') {
+            return;
+        }
+
         const { ctx, chartArea, scales } = chart;
         if (!chartArea || !scales.y) return;
-        // Beispielbereiche für Fahrzeugdichte (anpassbar!)
+
+        // Beispielbereiche für Fahrzeugdichte (Anzahl Fahrzeuge/Minute)
         // [unten, oben, Farbe, Opazität]
         const ranges = [
-            [0, 5, 'green', 0.12],
-            [5, 10, 'yellow', 0.13],
-            [10, 20, 'orange', 0.13],
-            [20, 100, 'red', 0.11]
+            [0, 5, 'green', 0.12], // Geringes Aufkommen
+            [5, 10, 'yellow', 0.13], // Mittleres Aufkommen
+            [10, 20, 'orange', 0.13], // Hohes Aufkommen
+            [20, 100, 'red', 0.11] // Sehr hohes Aufkommen / Stau
         ];
         ranges.forEach(([yMin, yMax, color, alpha]) => {
             ctx.save();
@@ -67,7 +90,7 @@ const farben = {
     'Kleintransporter': 'red'
 };
 
-let alleEintraege = [];
+let alleEintraege = []; // Speichert alle gelesenen Daten mit Date-Objekten
 
 async function fetchFahrzeugDaten() {
     const response = await fetch('Daten/vehicle_counts.txt');
@@ -81,10 +104,12 @@ async function fetchFahrzeugDaten() {
             const datum = match[1];
             const zeit = match[2];
             const typ = match[3];
-            const datetime = new Date(datum + "T" + zeit);
+            const datetime = new Date(`${datum}T${zeit}`); // ISO 8601 Format für Date-Objekt
             data.push({ datetime, typ });
         }
     });
+    // Daten sortieren, falls sie nicht bereits chronologisch sind
+    data.sort((a, b) => a.datetime - b.datetime);
     return data;
 }
 
@@ -97,123 +122,283 @@ function gruppiereNachTyp(data) {
     return counts;
 }
 
-function gruppiereZeitverlauf(data, intervalMinuten = 1, filterTypen=[]) {
+function gruppiereZeitverlauf(data, intervalMinuten = 1) {
     // Gibt: {timeLabel: {Auto: x, Bus: y, ...}}
     let result = {};
     if (data.length === 0) return result;
-    // Nur gefilterte Typen (falls gesetzt)
-    if (filterTypen.length > 0) {
-        data = data.filter(e => filterTypen.includes(e.typ));
-    }
-    // Finde früheste und späteste Zeit
-    data.sort((a,b) => a.datetime-b.datetime);
+
+    // Definiere alle möglichen Typen, um sicherzustellen, dass sie in jeder Zeitspanne vorkommen
+    const allTypes = Object.keys(farben);
+
+    // Finde früheste und späteste Zeit der gefilterten Daten
     const start = new Date(data[0].datetime);
-    const end = new Date(data[data.length-1].datetime);
-    // Zeitstempel für jede Zeiteinheit
-    for(let t = new Date(start); t <= end; t.setMinutes(t.getMinutes()+intervalMinuten)) {
-        const label = t.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        result[label] = {};
-        for(const typ of Object.keys(farben)) result[label][typ]=0;
+    const end = new Date(data[data.length - 1].datetime);
+
+    // Iteriere über Zeitstempel im angegebenen Intervall
+    for (let t = new Date(start); t <= end; t.setMinutes(t.getMinutes() + intervalMinuten)) {
+        // Setze Sekunden und Millisekunden auf 0 für saubere Gruppierung
+        let currentIntervalStart = new Date(t);
+        currentIntervalStart.setSeconds(0, 0);
+        if (intervalMinuten > 1) {
+            currentIntervalStart.setMinutes(Math.floor(currentIntervalStart.getMinutes() / intervalMinuten) * intervalMinuten);
+        }
+        
+        // Verwende den vollen ISO-String als eindeutigen Schlüssel
+        const labelKey = currentIntervalStart.toISOString(); 
+        
+        if (!result[labelKey]) {
+            result[labelKey] = {};
+            for (const typ of allTypes) {
+                result[labelKey][typ] = 0; // Alle Typen mit 0 initialisieren
+            }
+        }
     }
+
     // Einträge jeweils zuordnen
     data.forEach(e => {
-        // Finde Zeitfenster
         let t = new Date(e.datetime);
-        t.setSeconds(0,0);
-        if (intervalMinuten > 1) t.setMinutes(Math.floor(t.getMinutes()/intervalMinuten)*intervalMinuten);
-        const label = t.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        if (!result[label]) {
-            // Kann vorkommen bei Zeitfilter, dann ergänzen
-            result[label] = {};
-            for(const typ of Object.keys(farben)) result[label][typ]=0;
+        t.setSeconds(0, 0);
+        if (intervalMinuten > 1) {
+            t.setMinutes(Math.floor(t.getMinutes() / intervalMinuten) * intervalMinuten);
         }
-        result[label][e.typ] = (result[label][e.typ]||0) + 1;
+        const labelKey = t.toISOString();
+
+        // Stelle sicher, dass der Schlüssel existiert (könnte vorkommen, wenn Daten außerhalb des initialisierten Bereichs liegen)
+        if (!result[labelKey]) {
+            result[labelKey] = {};
+            for (const typ of allTypes) {
+                result[labelKey][typ] = 0;
+            }
+        }
+        result[labelKey][e.typ] = (result[labelKey][e.typ] || 0) + 1;
     });
-    return result;
+
+    // Sortiere die Schlüssel und wandle sie in lesbare Labels um
+    const sortedKeys = Object.keys(result).sort();
+    const finalResult = {};
+    const hasMultipleDays = sortedKeys.length > 0 && new Date(sortedKeys[0]).getDate() !== new Date(sortedKeys[sortedKeys.length - 1]).getDate();
+
+    sortedKeys.forEach(key => {
+        const dateObj = new Date(key);
+        let displayLabel;
+        
+        // Anzeigeformat je nach Zeitraum
+        if (sortedKeys.length > 60 || hasMultipleDays) { // Mehr als 60 Punkte ODER über mehrere Tage
+             displayLabel = dateObj.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'}) + ' ' + dateObj.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'});
+        } else { // Wenige Punkte, präzise Uhrzeit
+            displayLabel = dateObj.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        }
+        finalResult[displayLabel] = result[key];
+    });
+
+    return finalResult;
 }
 
 let balkenChart, linienChart;
 
+// Hauptfunktion zum Initialisieren und Aktualisieren beider Charts
 async function ladeFahrzeugDaten() {
-    // Filter nach Zeitraum
     alleEintraege = await fetchFahrzeugDaten();
-
-    // --- 1. Fahrzeugaufkommen nach Typ ---
-    const counts = gruppiereNachTyp(alleEintraege);
-    const labels = Object.keys(farben).filter(typ => counts[typ]);
-    const daten = labels.map(typ => counts[typ]||0);
-    const chartdata = {
-        labels: labels,
-        datasets: [{
-            label: 'Anzahl',
-            data: daten,
-            backgroundColor: labels.map(typ=>farben[typ]||'gray')
-        }]
-    };
-    if (balkenChart) balkenChart.destroy();
-    balkenChart = new Chart(document.getElementById('fahrzeug-balken').getContext('2d'), {
-        type: 'bar',
-        data: chartdata,
-        options: {
-            plugins: {
-                legend: {display: false},
-                tooltip: {enabled: true}
-            },
-            scales: {
-                y: {beginAtZero:true, title:{display:true, text:'Anzahl'}}
-            }
-        }
-    });
-
-    // --- 2. Zeitverlauf (nach gewähltem Zeitraum) ---
-    updateLinienDiagramm();
+    applyFilters(); // Beide Charts beim Start aktualisieren
 }
 
-function updateLinienDiagramm() {
-    let zeitraum = document.getElementById('zeitraum').value;
-    let gefiltert = [];
-    if (zeitraum === 'all') {
-        gefiltert = alleEintraege;
-    } else {
-        const minuten = parseInt(zeitraum);
-        const grenze = new Date(Date.now() - minuten*60000);
-        gefiltert = alleEintraege.filter(e => e.datetime >= grenze);
+// Funktion, die von beiden "Anzeigen"-Buttons aufgerufen wird
+function applyFilters() {
+    const zeitraumPreset = document.getElementById('zeitraum-preset').value;
+    const vonStr = document.getElementById('von-datum-zeit').value;
+    const bisStr = document.getElementById('bis-datum-zeit').value;
+
+    let filteredEntries = [];
+    let chartTitleLine = 'Fahrzeugdichte im Zeitverlauf';
+    let chartTitleBar = 'Fahrzeugaufkommen nach Typ';
+    let intervalMinutes = 1; // Standard-Intervall für Linien-Chart Gruppierung
+
+    // Zuerst "Von-bis" prüfen, da es die höchste Priorität hat
+    if (vonStr || bisStr) {
+        let vonDate = vonStr ? new Date(vonStr) : null;
+        let bisDate = bisStr ? new Date(bisStr) : null;
+
+        if (!vonDate && !bisDate) {
+            alert('Bitte geben Sie einen "Von"- oder "Bis"-Zeitpunkt für die Filterung an.');
+            return;
+        }
+
+        filteredEntries = alleEintraege.filter(e => {
+            const currentEntryDate = e.datetime;
+            const isAfterVon = vonDate ? currentEntryDate >= vonDate : true;
+            const isBeforeBis = bisDate ? currentEntryDate <= bisDate : true;
+            return isAfterVon && isBeforeBis;
+        });
+
+        if (filteredEntries.length === 0) {
+            alert('Keine Daten im ausgewählten "Von-bis"-Zeitraum gefunden.');
+            // Leere beide Charts
+            renderBarChart([], [], 'Fahrzeugaufkommen (Keine Daten)');
+            renderLineChart([], [], 'Fahrzeugdichte (Keine Daten)');
+            return;
+        }
+
+        // Titel für "Von-bis"
+        chartTitleLine = `Fahrzeugdichte (Von: ${vonStr || 'Anfang'} Bis: ${bisStr || 'Ende'})`;
+        chartTitleBar = `Fahrzeugaufkommen (Von: ${vonStr || 'Anfang'} Bis: ${bisStr || 'Ende'})`;
+
+        // Intervall für Linien-Chart basierend auf Dauer
+        const diffMs = (bisDate || new Date()).getTime() - (vonDate || filteredEntries[0].datetime).getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        if (diffHours > 24) intervalMinutes = 60; // Stundenweise bei mehr als 24h
+        else if (diffHours > 4) intervalMinutes = 10; // 10-Minuten-Intervalle bei mehr als 4h
+
+        // Setze Preset-Dropdown zurück, wenn manueller Filter aktiv
+        document.getElementById('zeitraum-preset').value = 'all';
+
+    } else { // Wenn kein "Von-bis" Filter, dann die Presets verwenden
+        document.getElementById('von-datum-zeit').value = ''; // Felder leeren
+        document.getElementById('bis-datum-zeit').value = '';
+
+        if (zeitraumPreset === 'all') {
+            filteredEntries = alleEintraege;
+            chartTitleLine += ' (Gesamter Verlauf)';
+            chartTitleBar += ' (Gesamter Verlauf)';
+            intervalMinutes = 60; // Größeres Intervall für "All"
+        } else if (zeitraumPreset.startsWith('last')) {
+            const now = new Date();
+            let cutoffTime;
+
+            if (zeitraumPreset.endsWith('min')) {
+                const minutes = parseInt(zeitraumPreset.replace('last', '').replace('min', ''));
+                cutoffTime = new Date(now.getTime() - minutes * 60 * 1000);
+                chartTitleLine += ` (Letzte ${minutes} Minuten)`;
+                chartTitleBar += ` (Letzte ${minutes} Minuten)`;
+                intervalMinutes = 1;
+            } else if (zeitraumPreset.endsWith('h')) {
+                const hours = parseInt(zeitraumPreset.replace('last', '').replace('h', ''));
+                cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+                chartTitleLine += ` (Letzte ${hours} Stunden)`;
+                chartTitleBar += ` (Letzte ${hours} Stunden)`;
+                intervalMinutes = 5;
+            }
+
+            filteredEntries = alleEintraege.filter(e => e.datetime >= cutoffTime);
+
+            if (filteredEntries.length === 0 && alleEintraege.length > 0) {
+                alert('Keine Daten für den ausgewählten Zeitraum gefunden. Möglicherweise ist der Datenbestand älter als der gewählte Zeitraum.');
+                // Leere beide Charts
+                renderBarChart([], [], 'Fahrzeugaufkommen (Keine Daten)');
+                renderLineChart([], [], 'Fahrzeugdichte (Keine Daten)');
+                return;
+            }
+        }
     }
-    // Gruppieren: 1-Minuten-Intervalle
-    const interval = (zeitraum === 'all' ? 10 : 1); // bei "alle" gröber samplen
-    const verlauf = gruppiereZeitverlauf(gefiltert, interval);
-    const labels = Object.keys(verlauf);
-    const datensaetze = Object.keys(farben).map(typ => ({
+
+    // Daten für Balkendiagramm rendern
+    const counts = gruppiereNachTyp(filteredEntries);
+    const barLabels = Object.keys(farben).filter(typ => counts[typ] > 0).sort(); // Nur Typen mit Zählungen anzeigen und sortieren
+    const barData = barLabels.map(typ => counts[typ] || 0);
+    renderBarChart(barLabels, barData, chartTitleBar);
+
+    // Daten für Liniendiagramm rendern
+    const verlauf = gruppiereZeitverlauf(filteredEntries, intervalMinutes);
+    const lineLabels = Object.keys(verlauf);
+    const lineDatasets = Object.keys(farben).map(typ => ({
         label: typ,
-        data: labels.map(l=>verlauf[l][typ]||0),
+        data: lineLabels.map(l => verlauf[l][typ] || 0),
         borderColor: farben[typ],
         backgroundColor: farben[typ],
         fill: false,
-        tension: 0.1
+        tension: 0.1,
+        pointRadius: 2
     }));
+    renderLineChart(lineLabels, lineDatasets, chartTitleLine);
+}
 
+// --- Funktionen zum Rendern der Charts ---
+
+function renderBarChart(labels, data, titleText) {
+    if (balkenChart) balkenChart.destroy();
+    
+    // Titel des h2-Elements aktualisieren
+    document.getElementById('balken-chart-title').innerText = titleText;
+
+    balkenChart = new Chart(document.getElementById('fahrzeug-balken').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Anzahl',
+                data: data,
+                backgroundColor: labels.map(typ => farben[typ] || 'gray')
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: {
+                    display: false, // Titel wird jetzt im h2-Element gesetzt
+                    text: titleText,
+                    font: { size: 16 }
+                },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    title: { display: true, text: 'Anzahl der Fahrzeuge' } 
+                },
+                x: { 
+                    title: { display: true, text: 'Fahrzeugtyp' } 
+                }
+            }
+        }
+    });
+}
+
+function renderLineChart(labels, datasets, titleText) {
     if (linienChart) linienChart.destroy();
     linienChart = new Chart(document.getElementById('fahrzeug-linie').getContext('2d'), {
         type: 'line',
         data: {
             labels: labels,
-            datasets: datensaetze
+            datasets: datasets
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: {position: 'top'},
-                tooltip: {enabled:true}
+                legend: { 
+                    position: 'right', 
+                    align: 'center',
+                    labels: {
+                        boxWidth: 20
+                    }
+                },
+                title: {
+                    display: true,
+                    text: titleText,
+                    font: { size: 16 }
+                }
             },
             scales: {
-                y: {beginAtZero:true, title:{display:true, text:'Anzahl'}}
+                y: { 
+                    beginAtZero: true, 
+                    title: { display: true, text: 'Anzahl Fahrzeuge pro Intervall' } 
+                },
+                x: {
+                    title: { display: true, text: 'Zeit' },
+                    ticks: {
+                        maxRotation: 45, 
+                        minRotation: 45
+                    }
+                }
             }
         },
         plugins: [backgroundRangesPlugin]
     });
 }
 
-// Eventlistener für Zeitraum
-document.getElementById('zeitraum').addEventListener('change', updateLinienDiagramm);
+// Eventlistener für das Preset-Dropdown
+document.getElementById('zeitraum-preset').addEventListener('change', applyFilters);
 
 // Beim Laden initialisieren
 ladeFahrzeugDaten();
