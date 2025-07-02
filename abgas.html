@@ -9,20 +9,51 @@
         body {
             font-family: Arial, sans-serif;
             background: #f7f7f7;
-            margin: 40px;
+            margin: 0; /* Changed from 40px to 0 */
+        }
+
+        /* Styles für die obere Navigation */
+        .top-nav {
+            background: #224e7a; /* Dunkelblau, passend zum ersten Beispiel */
+            color: #fff;
+            padding: 10px 0; /* Padding angepasst für die Höhe */
+            display: flex;
+            justify-content: center; /* Zentriert die Navigationspunkte */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%; /* Passt über die gesamte Seitenbreite */
+        }
+        .top-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px; /* Abstand zwischen den Navigationspunkten */
+            font-size: 1.13em;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: inline-block; /* Für korrekten Abstand und Padding */
+        }
+        .top-nav a.active, .top-nav a:hover {
+            background: #163c5a; /* Etwas dunkler für Hover/Active */
+            text-decoration: underline;
+        }
+
+        h1 {
+            margin-top: 20px; /* Added margin to match previous pages */
         }
 
         h2 {
             margin-top: 40px;
         }
 
+        /* Hauptcontainer unterhalb der Navigation */
         #container {
-            max-width: 1000px;
-            margin: auto;
+            max-width: 1400px; /* Angepasst an das erste Beispiel */
+            margin: 40px auto;
             background: #fff;
-            padding: 36px;
-            border-radius: 10px;
-            box-shadow: 0 0 16px #c2c2c2;
+            border-radius: 8px;
+            box-shadow: 0 0 8px #ccc;
+            padding: 30px 40px; /* Padding wie im ersten Beispiel main-content */
         }
 
         .chart-block {
@@ -34,25 +65,6 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-        }
-
-        .nav {
-            margin-bottom: 30px;
-            background: #224e7a;
-            color: #fff;
-            padding: 14px 24px;
-            border-radius: 6px;
-        }
-
-        .nav a {
-            color: #fff;
-            margin-right: 30px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .nav a:hover {
-            text-decoration: underline;
         }
 
         .input-row label {
@@ -72,12 +84,18 @@
 
         canvas {
             width: 100% !important;
-            height: auto !important;
-            max-width: 100%;
+            height: 560px !important; /* Adjusted to match previous pages */
+            max-width: 1100px; /* Adjusted to match previous pages */
             min-height: 320px;
             border-radius: 8px;
             background: #fafcff;
             box-shadow: 0 2px 8px #dde2ee;
+            display: block;
+            margin: auto;
+        }
+
+        @media (max-width: 600px) {
+            canvas { height: 250px !important; } /* Adjusted to match previous pages */
         }
 
         #berechnung-erklaerung {
@@ -124,14 +142,14 @@
     </style>
 </head>
 <body>
+<nav class="top-nav">
+    <a href="index.html">Start</a>
+    <a href="laerm.html">Lärmpegel</a>
+    <a href="abgas.html" class="active">Abgas</a>
+    <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
+</nav>
 <div id="container">
-    <div class="nav">
-        <a href="index.html">Start</a>
-        <a href="laerm.html">Lärmpegel</a>
-        <a href="abgas.html">Abgas</a>
-        <a href="stau.html">Stau</a>
-    </div>
-    <h1>Fahrzeugemissionen (stündlich)</h1>
+    <h1>Abgas</h1>
     <div class="chart-block">
         <h2>CO₂- und Feinstaubausstoß pro Stunde</h2>
         <p>Berechnet nach Fahrzeugtyp und Emissionsfaktoren. Streckenlänge: 2,5 km<br>
@@ -153,7 +171,7 @@
             <input type="datetime-local" id="bis" style="margin-right:8px;">
             <button onclick="zeitraumVonBis()">Anwenden</button>
         </div>
-        <canvas id="emission-chart" height="320" width="1000"></canvas>
+        <canvas id="emission-chart"></canvas>
         <div id="berechnung-erklaerung">
             <h3>Erläuterung der Emissionsberechnung</h3>
             <p>Die Emissionen von \(\text{CO}_2\) und Feinstaub werden stündlich basierend auf der Anzahl der erkannten Fahrzeuge und vordefinierten Emissionsfaktoren berechnet. Die angenommene Streckenlänge für jedes Fahrzeug beträgt <b>2,5 km</b>.</p>
