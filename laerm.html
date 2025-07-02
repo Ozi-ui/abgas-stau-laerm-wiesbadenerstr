@@ -153,7 +153,7 @@ let alleRawLabels = [];
 let alleRawDaten = [];
 
 async function fetchPegelDaten() {
-    const response = await fetch('Daten/pegel.txt');
+    const response = await fetch('Daten/pegel.txt'); // Pfad zu deiner Daten-Textdatei
     const text = await response.text();
     const lines = text.trim().split('\n');
     const labels = [];
@@ -256,7 +256,8 @@ async function ladePegelDaten() {
                     fill: true,
                     tension: 0.3,
                     pointRadius: 0,
-                    pointHoverRadius: 0
+                    pointHoverRadius: 0,
+                    z: 0 // Diese Linie ist im Hintergrund (Standardwert ist 0)
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
@@ -265,7 +266,8 @@ async function ladePegelDaten() {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 },
                 {
                     label: 'WHO kritisch (65 dB)',
@@ -274,7 +276,8 @@ async function ladePegelDaten() {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 },
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
@@ -283,7 +286,8 @@ async function ladePegelDaten() {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 }
             ]
         },
@@ -329,7 +333,8 @@ function renderHistoricChart(labels, daten) {
                     fill: true,
                     tension: 0.3,
                     pointRadius: 0,
-                    pointHoverRadius: 0
+                    pointHoverRadius: 0,
+                    z: 0 // Diese Linie ist im Hintergrund
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
@@ -338,7 +343,8 @@ function renderHistoricChart(labels, daten) {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 },
                 {
                     label: 'WHO kritisch (65 dB)',
@@ -347,7 +353,8 @@ function renderHistoricChart(labels, daten) {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 },
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
@@ -356,7 +363,8 @@ function renderHistoricChart(labels, daten) {
                     borderDash: [4,4],
                     pointRadius: 0,
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    z: 1 // Diese Linie ist im Vordergrund
                 }
             ]
         },
