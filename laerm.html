@@ -5,17 +5,66 @@
     <title>Lärmpegel-Auswertung</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
-        h2 { margin-top: 40px; }
-        #container { max-width: 800px; margin: auto; background: #fff; padding: 36px; border-radius: 10px; box-shadow: 0 0 16px #c2c2c2; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+        }
+        .main-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            min-width: 210px;
+            background: linear-gradient(180deg, #224e7a 80%, #18416a 100%);
+            color: #fff;
+            padding: 38px 0 0 0;
+            box-shadow: 2px 0 24px #b7c3d7;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+        }
+        .sidebar-nav a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 16px 32px;
+            font-size: 1.1em;
+            border-left: 5px solid transparent;
+            transition: background 0.18s, border-color 0.16s;
+        }
+        .sidebar-nav a.active,
+        .sidebar-nav a:hover {
+            background: rgba(255,255,255,0.12);
+            border-left: 5px solid #ffcc00;
+            color: #ffcc00;
+        }
+        #container {
+            flex: 1;
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 36px;
+            border-radius: 10px;
+            box-shadow: 0 0 16px #c2c2c2;
+        }
         .chart-block { margin-bottom: 55px; }
         .input-row { margin-bottom: 18px; display: flex; align-items: center; flex-wrap: wrap;}
-        .nav { margin-bottom: 30px; background: #224e7a; color: #fff; padding: 14px 24px; border-radius: 6px;}
-        .nav a { color: #fff; margin-right: 30px; text-decoration: none; font-weight: bold;}
-        .nav a:hover { text-decoration: underline; }
         .input-row label { margin-right: 8px; }
-        @media (max-width: 800px) {
-            #container { padding: 3vw; }
+        @media (max-width: 1000px) {
+            .main-layout { flex-direction: column; }
+            .sidebar { flex-direction: row; min-width: 0; width: 100%; box-shadow: none; padding: 8px 0;}
+            .sidebar-nav { flex-direction: row; width: 100%; justify-content: space-around;}
+            .sidebar-nav a { border-left: none; border-bottom: 4px solid transparent; padding: 12px 18px; }
+            .sidebar-nav a.active, .sidebar-nav a:hover { background: rgba(255,255,255,0.12); border-bottom: 4px solid #ffcc00; border-left: none;}
+            #container { margin: 22px 4vw; padding: 3vw; }
             .input-row { flex-direction: column; align-items: stretch;}
         }
         canvas {
@@ -32,41 +81,45 @@
     </style>
 </head>
 <body>
-<div id="container">
-    <div class="nav">
-        <a href="index.html">Start</a>
-        <a href="laerm.html">Lärmpegel</a>
-        <a href="abgas.html">Abgas</a>
-        <a href="stau.html">Stau</a>
-    </div>
-    <h1>Lärmpegel Monitoring</h1>
-
-    <div class="chart-block">
-        <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
-        <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
-        <canvas id="laermpegel-live"></canvas>
-    </div>
-
-    <div class="chart-block">
-        <h2>Historische Lärmpegel-Auswertung</h2>
-        <div class="input-row">
-            <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
-            <select id="zeitraum-select" onchange="setZeitraumSelect()">
-                <option value="10">letzte 10 Minuten</option>
-                <option value="30">letzte 30 Minuten</option>
-                <option value="60">letzte 1 Stunde</option>
-                <option value="360">letzte 6 Stunden</option>
-                <option value="720">letzte 12 Stunden</option>
-                <option value="1440">letzte 24 Stunden</option>
-            </select>
-            <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
-            <label for="von">von:</label>
-            <input type="datetime-local" id="von" style="margin-right:8px;">
-            <label for="bis">bis:</label>
-            <input type="datetime-local" id="bis" style="margin-right:8px;">
-            <button onclick="zeitraumVonBis()">Anwenden</button>
+<div class="main-layout">
+    <nav class="sidebar">
+        <div class="sidebar-nav">
+            <a href="index.html">Start</a>
+            <a href="laerm.html" class="active">Lärmpegel</a>
+            <a href="abgas.html">Abgas</a>
+            <a href="stau.html">Stau</a>
         </div>
-        <canvas id="laermpegel-historic"></canvas>
+    </nav>
+    <div id="container">
+        <h1>Lärmpegel Monitoring</h1>
+
+        <div class="chart-block">
+            <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
+            <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
+            <canvas id="laermpegel-live"></canvas>
+        </div>
+
+        <div class="chart-block">
+            <h2>Historische Lärmpegel-Auswertung</h2>
+            <div class="input-row">
+                <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
+                <select id="zeitraum-select" onchange="setZeitraumSelect()">
+                    <option value="10">letzte 10 Minuten</option>
+                    <option value="30">letzte 30 Minuten</option>
+                    <option value="60">letzte 1 Stunde</option>
+                    <option value="360">letzte 6 Stunden</option>
+                    <option value="720">letzte 12 Stunden</option>
+                    <option value="1440">letzte 24 Stunden</option>
+                </select>
+                <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
+                <label for="von">von:</label>
+                <input type="datetime-local" id="von" style="margin-right:8px;">
+                <label for="bis">bis:</label>
+                <input type="datetime-local" id="bis" style="margin-right:8px;">
+                <button onclick="zeitraumVonBis()">Anwenden</button>
+            </div>
+            <canvas id="laermpegel-historic"></canvas>
+        </div>
     </div>
 </div>
 
@@ -199,7 +252,7 @@ async function ladePegelDaten() {
                     label: 'Lärmpegel (dB)',
                     data: liveDaten,
                     borderColor: '#1a74d6',
-                    borderWidth: 1, // Dünnere Linie
+                    borderWidth: 1,
                     backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
                     tension: 0.3,
@@ -246,7 +299,7 @@ async function ladePegelDaten() {
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 8 }
                 },
                 y: { 
-                    min: 20, // Erweiterung bis 20 dB
+                    min: 20,
                     max: 100, 
                     title: {display:true, text:'dB'}, 
                     grid: { color: '#eee' }, 
@@ -272,7 +325,7 @@ function renderHistoricChart(labels, daten) {
                     label: 'Lärmpegel (dB)',
                     data: daten,
                     borderColor: '#1a74d6',
-                    borderWidth: 1, // Dünnere Linie
+                    borderWidth: 1,
                     backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
                     tension: 0.3,
@@ -319,7 +372,7 @@ function renderHistoricChart(labels, daten) {
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 10 }
                 },
                 y: { 
-                    min: 20, // Erweiterung bis 20 dB
+                    min: 20,
                     max: 100, 
                     title: {display:true, text:'dB'}, 
                     grid: { color: '#eee' }, 
