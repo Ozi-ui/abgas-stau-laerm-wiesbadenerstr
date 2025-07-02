@@ -257,37 +257,37 @@ async function ladePegelDaten() {
                     tension: 0.3,
                     pointRadius: 0,
                     pointHoverRadius: 0,
-                    z: 0 // Diese Linie ist im Hintergrund (Standardwert ist 0)
+                    z: 0 
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, liveLabels.length),
-                    borderColor: '#1bc13b',
-                    borderDash: [4,4],
+                    borderColor: '#32CD32', // Helleres Grün
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt, um durchgehende Linie zu erhalten
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 },
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, liveLabels.length),
-                    borderColor: '#e8a100',
-                    borderDash: [4,4],
+                    borderColor: '#FFD700', // Helleres Gelb/Gold
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 },
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, liveLabels.length),
-                    borderColor: '#e13c3c',
-                    borderDash: [4,4],
+                    borderColor: '#FF4500', // Helleres Rot/Orange
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 }
             ]
         },
@@ -334,37 +334,37 @@ function renderHistoricChart(labels, daten) {
                     tension: 0.3,
                     pointRadius: 0,
                     pointHoverRadius: 0,
-                    z: 0 // Diese Linie ist im Hintergrund
+                    z: 0 
                 },
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, labels.length),
-                    borderColor: '#1bc13b',
-                    borderDash: [4,4],
+                    borderColor: '#32CD32', // Helleres Grün
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 },
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, labels.length),
-                    borderColor: '#e8a100',
-                    borderDash: [4,4],
+                    borderColor: '#FFD700', // Helleres Gelb/Gold
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 },
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, labels.length),
-                    borderColor: '#e13c3c',
-                    borderDash: [4,4],
+                    borderColor: '#FF4500', // Helleres Rot/Orange
+                    borderWidth: 2, // Dickere Linie
+                    // borderDash: [4,4], // Entfernt
                     pointRadius: 0,
-                    borderWidth: 1,
                     fill: false,
-                    z: 1 // Diese Linie ist im Vordergrund
+                    z: 1 
                 }
             ]
         },
