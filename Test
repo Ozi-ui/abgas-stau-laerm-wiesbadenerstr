@@ -2,29 +2,244 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Fahrzeugemissionen-Auswertung</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
+        h2 { margin-top: 40px; }
+        #container { max-width: 1000px; margin: auto; background: #fff; padding: 36px; border-radius: 10px; box-shadow: 0 0 16px #c2c2c2; }
+        .chart-block { margin-bottom: 55px; }
+        .input-row { margin-bottom: 18px; display: flex; align-items: center; flex-wrap: wrap;}
+        .nav { margin-bottom: 30px; background: #224e7a; color: #fff; padding: 14px 24px; border-radius: 6px;}
+        .nav a { color: #fff; margin-right: 30px; text-decoration: none; font-weight: bold;}
+        .nav a:hover { text-decoration: underline; }
+        .input-row label { margin-right: 8px; }
+        @media (max-width: 800px) {
+            #container { padding: 3vw; }
+            .input-row { flex-direction: column; align-items: stretch;}
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100%;
+            min-height: 320px;
+            border-radius: 8px;
+            background: #fafcff;
+            box-shadow: 0 2px 8px #dde2ee;
+        }
+    </style>
 </head>
 <body>
-<div id="laermpegel"></div>
+<div id="container">
+    <div class="nav">
+        <a href="index.html">Start</a>
+        <a href="laerm.html">Lärmpegel</a>
+        <a href="abgas.html">Abgas</a>
+        <a href="stau.html">Stau</a>
+    </div>
+    <h1>Fahrzeugemissionen (stündlich)</h1>
+    <div class="chart-block">
+        <h2>CO₂- und Feinstaubausstoß pro Stunde</h2>
+        <p>Berechnet nach Fahrzeugtyp und Emissionsfaktoren. Streckenlänge: 2,5 km</p>
+        <div class="input-row">
+            <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
+            <select id="zeitraum-select" onchange="setZeitraumSelect()">
+                <option value="1">letzte 1 Stunde</option>
+                <option value="6">letzte 6 Stunden</option>
+                <option value="12">letzte 12 Stunden</option>
+                <option value="24">letzte 24 Stunden</option>
+                <option value="48">letzte 48 Stunden</option>
+                <option value="168">letzte 7 Tage</option>
+            </select>
+            <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
+            <label for="von">von:</label>
+            <input type="datetime-local" id="von" style="margin-right:8px;">
+            <label for="bis">bis:</label>
+            <input type="datetime-local" id="bis" style="margin-right:8px;">
+            <button onclick="zeitraumVonBis()">Anwenden</button>
+        </div>
+        <canvas id="emission-chart" height="320" width="1000"></canvas>
+    </div>
+</div>
 <script>
-const daten = [
-    {x: ['2025-07-01 21:03:44', '2025-07-01 21:03:45', '2025-07-01 21:03:46'], y: [64.44, 65.78, 65.49], mode: 'lines', name: 'Lärmpegel (dB)', line: {color: 'blue'}}
-];
-const shapes = [
-    // Schwellen-Bereiche farbig hinterlegen wie axhspan
-    {type: 'rect', yref: 'y', y0: 20, y1: 55, xref: 'paper', x0: 0, x1: 1, fillcolor: 'green', opacity: 0.1, line: {width: 0}},
-    {type: 'rect', yref: 'y', y0: 55, y1: 65, xref: 'paper', x0: 0, x1: 1, fillcolor: 'yellow', opacity: 0.15, line: {width: 0}},
-    {type: 'rect', yref: 'y', y0: 65, y1: 70, xref: 'paper', x0: 0, x1: 1, fillcolor: 'orange', opacity: 0.15, line: {width: 0}},
-    {type: 'rect', yref: 'y', y0: 70, y1: 100, xref: 'paper', x0: 0, x1: 1, fillcolor: 'red', opacity: 0.12, line: {width: 0}}
-];
-const layout = {
-    title: "Lärmpegel mit WHO-Schwellen",
-    yaxis: {range: [20, 100], title: 'dB'},
-    xaxis: {title: 'Zeit', tickangle: -45},
-    shapes: shapes,
-    legend: {x: 1.05, y: 1}
+const fahrzeugTypen = ["Auto", "Bus", "LKW", "Motorrad"];
+const emissionsFaktoren = {
+    "Auto":      { co2: 150, feinstaub: 0.005 },
+    "Bus":       { co2: 800, feinstaub: 0.005 },
+    "LKW":       { co2: 1000, feinstaub: 0.005 },
+    "Motorrad":  { co2: 90, feinstaub: 0.005 }
 };
-Plotly.newPlot('laermpegel', daten, layout);
+const streckenlaenge_km = 2.5;
+
+let stundenLabels = []; // ["2025-07-02 08:00", ...]
+let stundenEmissionenCO2 = []; // [kg]
+let stundenEmissionenFeinstaub = []; // [g]
+let rawStunden = []; // [{ label, counts: {Auto,Bus,LKW,Motorrad}, co2_kg, feinstaub_g }]
+let chart;
+
+async function ladeUndBerechne() {
+    // 1. Datei laden
+    const response = await fetch('Daten/vehicle_coun.txt');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+
+    // 2. Parsing & Zählen pro Stunde
+    // Map: "YYYY-MM-DD HH" => {Auto: 0, Bus: 0, ...}
+    const stundenMap = {};
+    lines.forEach(line => {
+        // Bsp: 2025-07-02 08:15:12;Auto
+        const parts = line.split(';');
+        if (parts.length !== 2) return;
+        const zeit = parts[0];
+        const typ = parts[1];
+        if (!fahrzeugTypen.includes(typ)) return;
+        const stunde = zeit.substr(0, 13); // "YYYY-MM-DD HH"
+        if (!stundenMap[stunde]) {
+            stundenMap[stunde] = { Auto:0, Bus:0, LKW:0, Motorrad:0 };
+        }
+        stundenMap[stunde][typ] += 1;
+    });
+
+    // 3. Emissionen berechnen (sortiert nach Zeit)
+    const sortedStunden = Object.keys(stundenMap).sort();
+    stundenLabels = [];
+    stundenEmissionenCO2 = [];
+    stundenEmissionenFeinstaub = [];
+    rawStunden = [];
+
+    for (const stunde of sortedStunden) {
+        const counts = stundenMap[stunde];
+        // CO2 in Gramm:
+        let co2_g = 0;
+        co2_g += counts.Auto      * streckenlaenge_km * emissionsFaktoren.Auto.co2;
+        co2_g += counts.Bus       * streckenlaenge_km * emissionsFaktoren.Bus.co2;
+        co2_g += counts.LKW       * streckenlaenge_km * emissionsFaktoren.LKW.co2;
+        co2_g += counts.Motorrad  * streckenlaenge_km * emissionsFaktoren.Motorrad.co2;
+        // Feinstaub in Gramm:
+        let feinstaub_g = (counts.Auto + counts.Bus + counts.LKW + counts.Motorrad)
+                          * streckenlaenge_km * emissionsFaktoren.Auto.feinstaub; // alle Typen gleich
+
+        stundenLabels.push(stunde + ":00");
+        stundenEmissionenCO2.push((co2_g / 1000).toFixed(2)); // kg
+        stundenEmissionenFeinstaub.push(feinstaub_g.toFixed(3)); // g
+
+        rawStunden.push({
+            label: stunde + ":00",
+            counts: {...counts},
+            co2_kg: (co2_g / 1000),
+            feinstaub_g: feinstaub_g
+        });
+    }
+
+    // Standard: letzte 6 Stunden anzeigen
+    updateChartPreset(6);
+}
+
+function setZeitraumSelect() {
+    document.getElementById('von').value = '';
+    document.getElementById('bis').value = '';
+    const stunden = parseInt(document.getElementById('zeitraum-select').value, 10);
+    updateChartPreset(stunden);
+}
+
+function updateChartPreset(stunden) {
+    // Zeigt die letzten X Stunden an
+    const n = Math.max(1, stunden);
+    const len = stundenLabels.length;
+    const start = Math.max(0, len - n);
+    const labels = stundenLabels.slice(start, len);
+    const co2   = stundenEmissionenCO2.slice(start, len);
+    const fs    = stundenEmissionenFeinstaub.slice(start, len);
+    renderChart(labels, co2, fs);
+}
+
+function zeitraumVonBis() {
+    const von = document.getElementById('von').value;
+    const bis = document.getElementById('bis').value;
+    if (!von || !bis) {
+        alert("Bitte 'von' und 'bis' Datum/Zeit wählen.");
+        return;
+    }
+    const vonD = new Date(von);
+    const bisD = new Date(bis);
+    if (vonD > bisD) {
+        alert("'von' muss kleiner als 'bis' sein!");
+        return;
+    }
+    // rawStunden: label: YYYY-MM-DD HH:00
+    const labels = [];
+    const co2 = [];
+    const fs = [];
+    for (const st of rawStunden) {
+        // label = "YYYY-MM-DD HH:00"
+        const dt = new Date(st.label.replace(' ', 'T'));
+        if (dt >= vonD && dt <= bisD) {
+            labels.push(st.label);
+            co2.push(st.co2_kg.toFixed(2));
+            fs.push(st.feinstaub_g.toFixed(3));
+        }
+    }
+    renderChart(labels, co2, fs);
+}
+
+function renderChart(labels, co2data, fsdata) {
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('emission-chart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'CO₂-Ausstoß (kg/h)',
+                    data: co2data,
+                    backgroundColor: 'rgba(26,116,214,0.25)',
+                    borderColor: '#1a74d6',
+                    borderWidth: 1,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Feinstaub-Ausstoß (g/h)',
+                    data: fsdata,
+                    backgroundColor: 'rgba(220, 95, 50, 0.15)',
+                    borderColor: '#e87e38',
+                    borderWidth: 1,
+                    yAxisID: 'y2'
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y + (ctx.dataset.label.includes('CO₂') ? ' kg' : ' g');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { color: '#eee' }, ticks: { color: '#555', maxRotation: 60, minRotation: 45 } },
+                y1: {
+                    position: 'left',
+                    title: { display: true, text: 'CO₂ (kg/h)' },
+                    min: 0,
+                    grid: { color: '#eee' },
+                    ticks: { color: '#1a74d6' }
+                },
+                y2: {
+                    position: 'right',
+                    title: { display: true, text: 'Feinstaub (g/h)' },
+                    min: 0,
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#e87e38' }
+                }
+            }
+        }
+    });
+}
+
+ladeUndBerechne();
 </script>
 </body>
 </html>
