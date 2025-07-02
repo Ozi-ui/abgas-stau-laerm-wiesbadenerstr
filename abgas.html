@@ -27,6 +27,37 @@
             background: #fafcff;
             box-shadow: 0 2px 8px #dde2ee;
         }
+        #berechnung-erklaerung {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e9f7ff;
+            border-left: 5px solid #1a74d6;
+            border-radius: 5px;
+        }
+        #berechnung-erklaerung h3 {
+            margin-top: 0;
+            color: #1a74d6;
+        }
+        #berechnung-erklaerung ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #berechnung-erklaerung li {
+            margin-bottom: 8px;
+        }
+        #berechnung-erklaerung table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        #berechnung-erklaerung th, #berechnung-erklaerung td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #berechnung-erklaerung th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +91,40 @@
             <button onclick="zeitraumVonBis()">Anwenden</button>
         </div>
         <canvas id="emission-chart" height="320" width="1000"></canvas>
+
+        <div id="berechnung-erklaerung">
+            <h3>Erläuterung der Emissionsberechnung</h3>
+            <p>Die Emissionen von CO₂ und Feinstaub werden stündlich basierend auf der Anzahl der erkannten Fahrzeuge und vordefinierten Emissionsfaktoren berechnet. Die angenommene Streckenlänge für jedes Fahrzeug beträgt <b>2,5 km</b>.</p>
+
+            <h4>Emissionsfaktoren pro Fahrzeug und Kilometer:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fahrzeugtyp</th>
+                        <th>CO₂-Faktor (g/km)</th>
+                        <th>Feinstaub-Faktor (g/km)</th>
+                    </tr>
+                </thead>
+                <tbody id="emissionsfaktoren-tabelle">
+                    </tbody>
+            </table>
+
+            <h4>Berechnungsformeln:</h4>
+            <ul>
+                <li>
+                    <b>CO₂-Gesamtemission pro Stunde (in Gramm):</b>
+                    <p>$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO₂-Faktor Fahrzeugtyp}_i)$</p>
+                    <p>Das Ergebnis wird anschließend von Gramm in Kilogramm umgerechnet ($\text{CO₂-Emission (kg)} = \text{CO₂-Gesamtemission (g)} / 1000$).</p>
+                </li>
+                <li>
+                    <b>Feinstaub-Gesamtemission pro Stunde (in Gramm):</b>
+                    <p>$\sum (\text{Anzahl Fahrzeuge gesamt} \times \text{Streckenlänge} \times \text{Feinstaub-Faktor aller Fahrzeuge})$</p>
+                    <p>Hierbei wird ein konstanter Feinstaub-Faktor für alle Fahrzeugtypen angenommen.</p>
+                </li>
+            </ul>
+            <p><b>Beispiel:</b> Wenn in einer Stunde 10 Autos erkannt werden, beträgt der CO₂-Ausstoß für Autos: $10 \times 2.5\, \text{km} \times 150\, \text{g/km} = 3750\, \text{g} = 3.75\, \text{kg}$. Der Feinstaub-Ausstoß für diese 10 Autos wäre: $10 \times 2.5\, \text{km} \times 0.005\, \text{g/km} = 0.125\, \text{g}$.</p>
+            <p>Diese Werte werden für jeden Fahrzeugtyp addiert, um die Gesamtstundenwerte zu erhalten.</p>
+        </div>
     </div>
 </div>
 <script>
@@ -127,7 +192,7 @@ async function ladeUndBerechne() {
         const parsed = parseLine(line);
         if (!parsed) return;
         const { datetime, type } = parsed;
-        const stunde = datetime.substr(0, 13); 
+        const stunde = datetime.substr(0, 13);
         if (!stundenMap[stunde]) {
             stundenMap[stunde] = { Auto:0, Bus:0, LKW:0, Motorrad:0 };
         }
@@ -143,12 +208,17 @@ async function ladeUndBerechne() {
     for (const stunde of sortedStunden) {
         const counts = stundenMap[stunde];
         let co2_g = 0;
-        co2_g += counts.Auto      * streckenlaenge_km * emissionsFaktoren.Auto.co2;
-        co2_g += counts.Bus       * streckenlaenge_km * emissionsFaktoren.Bus.co2;
-        co2_g += counts.LKW       * streckenlaenge_km * emissionsFaktoren.LKW.co2;
-        co2_g += counts.Motorrad  * streckenlaenge_km * emissionsFaktoren.Motorrad.co2;
-        let feinstaub_g = (counts.Auto + counts.Bus + counts.LKW + counts.Motorrad)
-                          * streckenlaenge_km * emissionsFaktoren.Auto.feinstaub;
+        let feinstaub_g = 0;
+        let totalVehicles = 0;
+
+        for (const type of fahrzeugTypen) {
+            const count = counts[type] || 0;
+            totalVehicles += count;
+            co2_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].co2 : 0);
+            // Assuming the same particulate matter factor for all vehicles as per original code
+            feinstaub_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].feinstaub : 0);
+        }
+
         stundenLabels.push(stunde + ":00");
         stundenEmissionenCO2.push((co2_g / 1000).toFixed(2)); // kg
         stundenEmissionenFeinstaub.push(feinstaub_g.toFixed(3)); // g
@@ -160,8 +230,23 @@ async function ladeUndBerechne() {
         });
     }
 
+    fillEmissionsFaktorenTable(); // Call to fill the new table
     updateChartPreset(6);
 }
+
+function fillEmissionsFaktorenTable() {
+    const tableBody = document.getElementById('emissionsfaktoren-tabelle');
+    tableBody.innerHTML = ''; // Clear existing rows
+    for (const type of fahrzeugTypen) {
+        const row = tableBody.insertRow();
+        const co2Factor = emissionsFaktoren[type] ? emissionsFaktoren[type].co2 : 'N/A';
+        const feinstaubFactor = emissionsFaktoren[type] ? emissionsFaktoren[type].feinstaub : 'N/A';
+        row.insertCell().textContent = type;
+        row.insertCell().textContent = co2Factor;
+        row.insertCell().textContent = feinstaubFactor;
+    }
+}
+
 
 function setZeitraumSelect() {
     document.getElementById('von').value = '';
@@ -181,6 +266,7 @@ function updateChartPreset(stunden) {
 }
 
 function zeitraumVonBis() {
+    document.getElementById('zeitraum-select').value = ''; // Reset select
     const von = document.getElementById('von').value;
     const bis = document.getElementById('bis').value;
     if (!von || !bis) {
