@@ -7,6 +7,33 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; }
+
+        /* Neue Styles für die Top-Navigation */
+        .top-nav {
+            background: #224e7a;
+            color: #fff;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center; /* Zentriert die Navigationspunkte */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%; /* Passt über die gesamte Seitenbreite */
+        }
+        .top-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 0 20px; /* Abstand zwischen den Navigationspunkten */
+            font-size: 1.13em;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: inline-block; /* Für korrekten Abstand und Padding */
+        }
+        .top-nav a.active, .top-nav a:hover {
+            background: #163c5a;
+            text-decoration: underline;
+        }
+
         #container {
             max-width: 1400px;
             margin: 40px auto;
@@ -14,34 +41,11 @@
             border-radius: 8px;
             box-shadow: 0 0 8px #ccc;
             display: flex;
+            flex-direction: column; /* Ändere die Hauptrichtung zu Spalte */
             min-height: 80vh;
         }
-        .sidebar {
-            width: 220px;
-            background: #224e7a;
-            color: #fff;
-            border-radius: 8px 0 0 8px;
-            padding: 32px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            margin: 10px 24px;
-            font-size: 1.13em;
-            padding: 6px 8px;
-            width: calc(100% - 48px);
-            border-radius: 4px;
-            transition: background 0.2s;
-            display: block;
-        }
-        .sidebar a.active, .sidebar a:hover {
-            background: #163c5a;
-            text-decoration: underline;
-        }
+        
+        /* Sidebar-Styles werden hier nicht mehr benötigt, da die Navigation oben ist */
         .main-content {
             flex: 1;
             padding: 30px 40px;
@@ -89,9 +93,7 @@
             .chart-wrapper { max-width: 98vw; }
         }
         @media (max-width: 900px) {
-            #container { flex-direction: column; }
-            .sidebar { flex-direction: row; width: 100%; border-radius: 8px 8px 0 0;}
-            .sidebar a { margin: 10px; font-size: 1em; width: auto;}
+            /* Hier keine Änderungen für Sidebar mehr nötig, da sie entfernt wurde */
             .main-content { padding: 20px 10px;}
         }
         @media (max-width: 600px) {
@@ -103,15 +105,15 @@
     </style>
 </head>
 <body>
+<nav class="top-nav">
+    <a href="index.html">Start</a>
+    <a href="laerm.html">Lärmpegel</a>
+    <a href="abgas.html">Abgas</a>
+    <a href="fahrzeuge.html" class="active">Fahrzeugaufkommen</a>
+</nav>
 <div id="container">
-    <nav class="sidebar">
-        <a href="index.html">Start</a>
-        <a href="fahrzeuge.html" class="active">Fahrzeugzählung</a>
-        <a href="stau.html">Stau</a>
-        <a href="laerm.html">Lärm</a>
-    </nav>
     <div class="main-content">
-        <h1>Fahrzeugzählung</h1>
+        <h1>Fahrzeugaufkommen</h1>
         <div class="chart-block">
             <h2 id="balken-chart-title">Fahrzeugaufkommen nach Typ (Filterbar)</h2>
             <div class="filter-block">
@@ -336,12 +338,12 @@ function applyBarFilters() {
             if (filteredEntries.length === 0 && alleEintraege.length > 0) {
                 alert('Keine Daten für den ausgewählten Zeitraum gefunden.');
                 renderBarChart([], 'Fahrzeugaufkommen (Keine Daten)');
-                gefilterteBarEintraege = [];
+                gefilmerteBarEintraege = [];
                 return;
             }
         }
     }
-    gefilterteBarEintraege = filteredEntries;
+    gefilmerteBarEintraege = filteredEntries;
     renderBarChart(filteredEntries, chartTitleBar);
 }
 
