@@ -186,7 +186,7 @@ function updateHistoricChartPreset(minuten) {
     let labels = [];
     let daten = [];
     if (filteredIdx.length > 0) {
-        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        labels = filteredIdx.map(i => alleRawLabels[i]);
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
 
@@ -216,7 +216,7 @@ function zeitraumVonBis() {
     let labels = [];
     let daten = [];
     if (filteredIdx.length > 0) {
-        labels = filteredIdx.map(i => alleRawLabels[i].substring(11));
+        labels = filteredIdx.map(i => alleRawLabels[i]);
         daten = filteredIdx.map(i => alleRawDaten[i]);
     }
 
