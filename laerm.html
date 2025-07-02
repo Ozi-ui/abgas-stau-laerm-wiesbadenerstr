@@ -13,39 +13,48 @@
         .main-layout {
             display: flex;
             min-height: 100vh;
+            flex-direction: column; /* Changed to column for top navigation */
         }
-        .sidebar {
-            min-width: 210px;
-            background: linear-gradient(180deg, #224e7a 80%, #18416a 100%);
+        .top-nav { /* New class for the top navigation */
+            background: #2b598d; /* Dark blue background from the image */
             color: #fff;
-            padding: 38px 0 0 0;
-            box-shadow: 2px 0 24px #b7c3d7;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
-            flex-direction: column;
-            align-items: stretch;
+            justify-content: flex-start; /* Align items to the start */
+            align-items: center;
+            height: 50px; /* Fixed height for the navigation bar */
+            border-radius: 8px; /* Rounded corners */
+            margin: 20px auto 0; /* Center the navigation and add top margin */
+            width: fit-content; /* Adjust width to content */
+            overflow: hidden; /* Hide overflow for rounded corners */
         }
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            width: 100%;
+        .top-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex; /* Make list items display in a row */
         }
-        .sidebar-nav a {
+        .top-nav li {
+            position: relative;
+        }
+        .top-nav a {
             display: block;
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            padding: 16px 32px;
-            font-size: 1.1em;
-            border-left: 5px solid transparent;
-            transition: background 0.18s, border-color 0.16s;
+            padding: 14px 22px; /* Adjust padding to match the image */
+            font-size: 1em; /* Adjust font size if necessary */
+            transition: background 0.18s, color 0.16s;
         }
-        .sidebar-nav a.active,
-        .sidebar-nav a:hover {
-            background: rgba(255,255,255,0.12);
-            border-left: 5px solid #ffcc00;
-            color: #ffcc00;
+        .top-nav a.active,
+        .top-nav a:hover {
+            background: rgba(255,255,255,0.2); /* Slightly lighter background on hover/active */
         }
+
+        /* Removed sidebar specific styles for desktop */
+        .sidebar { display: none; }
+
         #container {
             flex: 1;
             max-width: 900px;
@@ -60,10 +69,16 @@
         .input-row label { margin-right: 8px; }
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
-            .sidebar { flex-direction: row; min-width: 0; width: 100%; box-shadow: none; padding: 8px 0;}
-            .sidebar-nav { flex-direction: row; width: 100%; justify-content: space-around;}
-            .sidebar-nav a { border-left: none; border-bottom: 4px solid transparent; padding: 12px 18px; }
-            .sidebar-nav a.active, .sidebar-nav a:hover { background: rgba(255,255,255,0.12); border-bottom: 4px solid #ffcc00; border-left: none;}
+            .top-nav { /* Adjust top navigation for smaller screens if needed */
+                width: 96%;
+                margin: 20px 2%;
+                justify-content: space-around;
+            }
+            .top-nav a { padding: 12px 18px; }
+
+            /* Ensure sidebar is hidden on mobile too, or adjust for a different mobile nav if desired */
+            .sidebar { display: none; }
+
             #container { margin: 22px 4vw; padding: 3vw; }
             .input-row { flex-direction: column; align-items: stretch;}
         }
@@ -82,13 +97,13 @@
 </head>
 <body>
 <div class="main-layout">
-    <nav class="sidebar">
-        <div class="sidebar-nav">
-            <a href="index.html">Start</a>
-            <a href="laerm.html" class="active">Lärmpegel</a>
-            <a href="abgas.html">Abgas</a>
-            <a href="stau.html">Stau</a>
-        </div>
+    <nav class="top-nav">
+        <ul>
+            <li><a href="index.html">Start</a></li>
+            <li><a href="laerm.html" class="active">Lärmpegel</a></li>
+            <li><a href="abgas.html">Abgas</a></li>
+            <li><a href="stau.html">Stau</a></li>
+        </ul>
     </nav>
     <div id="container">
         <h1>Lärmpegel Monitoring</h1>
@@ -294,15 +309,15 @@ async function ladePegelDaten() {
                 tooltip: { cornerRadius: 8, backgroundColor: '#fff', titleColor: '#333', bodyColor: '#333' }
             },
             scales: {
-                x: { 
-                    grid: { color: '#eee' }, 
+                x: {
+                    grid: { color: '#eee' },
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 8 }
                 },
-                y: { 
+                y: {
                     min: 20,
-                    max: 100, 
-                    title: {display:true, text:'dB'}, 
-                    grid: { color: '#eee' }, 
+                    max: 100,
+                    title: {display:true, text:'dB'},
+                    grid: { color: '#eee' },
                     ticks: { color: '#555', font: { size: 13 }, stepSize: 5 }
                 }
             }
@@ -367,15 +382,15 @@ function renderHistoricChart(labels, daten) {
                 tooltip: { cornerRadius: 8, backgroundColor: '#fff', titleColor: '#333', bodyColor: '#333' }
             },
             scales: {
-                x: { 
-                    grid: { color: '#eee' }, 
+                x: {
+                    grid: { color: '#eee' },
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 10 }
                 },
-                y: { 
+                y: {
                     min: 20,
-                    max: 100, 
-                    title: {display:true, text:'dB'}, 
-                    grid: { color: '#eee' }, 
+                    max: 100,
+                    title: {display:true, text:'dB'},
+                    grid: { color: '#eee' },
                     ticks: { color: '#555', font: { size: 13 }, stepSize: 5 }
                 }
             }
