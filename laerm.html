@@ -199,11 +199,11 @@ async function ladePegelDaten() {
                     label: 'Lärmpegel (dB)',
                     data: liveDaten,
                     borderColor: '#1a74d6',
-                    borderWidth: 2,
+                    borderWidth: 1, // Dünnere Linie
                     backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
                     tension: 0.3,
-                    pointRadius: 0, // Keine Punkte!
+                    pointRadius: 0,
                     pointHoverRadius: 0
                 },
                 {
@@ -246,7 +246,7 @@ async function ladePegelDaten() {
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 8 }
                 },
                 y: { 
-                    min: 40, 
+                    min: 20, // Erweiterung bis 20 dB
                     max: 100, 
                     title: {display:true, text:'dB'}, 
                     grid: { color: '#eee' }, 
@@ -272,11 +272,11 @@ function renderHistoricChart(labels, daten) {
                     label: 'Lärmpegel (dB)',
                     data: daten,
                     borderColor: '#1a74d6',
-                    borderWidth: 2,
+                    borderWidth: 1, // Dünnere Linie
                     backgroundColor: 'rgba(26,116,214,0.08)',
                     fill: true,
                     tension: 0.3,
-                    pointRadius: 0, // Keine Punkte!
+                    pointRadius: 0,
                     pointHoverRadius: 0
                 },
                 {
@@ -319,7 +319,7 @@ function renderHistoricChart(labels, daten) {
                     ticks: { color: '#555', font: { size: 13 }, maxTicksLimit: 10 }
                 },
                 y: { 
-                    min: 40, 
+                    min: 20, // Erweiterung bis 20 dB
                     max: 100, 
                     title: {display:true, text:'dB'}, 
                     grid: { color: '#eee' }, 
