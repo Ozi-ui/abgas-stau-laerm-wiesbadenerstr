@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Fahrzeugemissionen-Auswertung</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
     <style>
         body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 40px; }
         h2 { margin-top: 40px; }
@@ -57,6 +60,10 @@
         }
         #berechnung-erklaerung th {
             background-color: #f2f2f2;
+        }
+        /* Zusätzliches Styling für MathJax-Formeln, falls nötig */
+        .MathJax_Display {
+            margin: 1em 0 !important; /* Passt den vertikalen Abstand an */
         }
     </style>
 </head>
@@ -113,13 +120,13 @@
             <ul>
                 <li>
                     <b>CO₂-Gesamtemission pro Stunde (in Gramm):</b>
-                    <p>$$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO₂-Faktor Fahrzeugtyp}_i)$$</p>
-                    <p>Das Ergebnis wird anschließend von Gramm in Kilogramm umgerechnet ($\text{CO₂-Emission (kg)} = \text{CO₂-Gesamtemission (g)} / 1000$).</p>
+                    $$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO₂-Faktor Fahrzeugtyp}_i)$$
+                    Das Ergebnis wird anschließend von Gramm in Kilogramm umgerechnet ($\text{CO₂-Emission (kg)} = \text{CO₂-Gesamtemission (g)} / 1000$).
                 </li>
                 <li>
                     <b>Feinstaub-Gesamtemission pro Stunde (in Gramm):</b>
-                    <p>$$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{Feinstaub-Faktor Fahrzeugtyp}_i)$$</p>
-                    <p>Hierbei wird der spezifische Feinstaub-Faktor für jeden Fahrzeugtyp verwendet.</p>
+                    $$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{Feinstaub-Faktor Fahrzeugtyp}_i)$$
+                    Hierbei wird der spezifische Feinstaub-Faktor für jeden Fahrzeugtyp verwendet.
                 </li>
             </ul>
             <p><b>Beispiel:</b> Wenn in einer Stunde 10 Autos erkannt werden:</p>
