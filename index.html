@@ -2,20 +2,20 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Nachbarschaft Lärmschutz Wiesbadener Straße</title>
+  <title>Nachbarschaft Lärmschutz Wiesbadener und Bischofs Kaller Straße</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fa; color: #222; }
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fa; color: #222; font-size: 1.05em; line-height: 1.6;} /* Adjusted base font-size and line-height */
     .container { display: flex; min-height: 100vh; }
     nav { width: 270px; background: #1854a3; color: #fff; display: flex; flex-direction: column; padding-top: 32px; box-shadow: 2px 0 12px #0002; position: sticky; top: 0; min-height: 100vh; z-index: 10;}
-    nav h1 { font-size: 1.3em; font-weight: 700; margin: 0 0 2em 0; padding: 0 30px; line-height: 1.2; color: #fff;}
+    nav h1 { font-size: 1.4em; font-weight: 700; margin: 0 0 2em 0; padding: 0 30px; line-height: 1.2; color: #fff;} /* Adjusted nav h1 font-size */
     nav ul { list-style: none; padding: 0; margin: 0 0 2em 0;}
     nav li { margin-bottom: 0.3em;}
     nav a { color: #fff; text-decoration: none; display: block; padding: 14px 36px; font-size: 1.07em; border-left: 4px solid transparent; transition: background 0.19s, border 0.19s; letter-spacing: 0.01em;}
     nav a.active, nav a:hover { background: #2365c9; border-left: 4px solid #fff;}
     .main { flex: 1; padding: 44px 5vw 44px 5vw; max-width: 900px; margin: 0 auto; background: #fff; box-shadow: 0 4px 24px #1854a318; border-radius: 0 0 22px 22px;}
-    .main h2 { color: #1854a3; margin-top: 2.1em;}
-    .main h3 { margin-bottom: 0.6em;}
+    .main h2 { color: #1854a3; margin-top: 2.1em; font-size: 1.8em;} /* Adjusted h2 font-size */
+    .main h3 { margin-bottom: 0.6em; font-size: 1.4em;} /* Adjusted h3 font-size */
     @media (max-width: 900px) {
       .container { flex-direction: column; }
       nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
@@ -25,13 +25,31 @@
     ul.probleme, ul.forderungen, ul.gefahr, ul.maengel {
       list-style: disc inside;
       margin-bottom: 1.2em;
+      padding-left: 1.2em; /* Added padding for better bullet point visibility */
+    }
+    .main p { margin-bottom: 1.2em; } /* Added margin to paragraphs for better spacing */
+    .petition-link {
+        display: block;
+        text-align: center;
+        margin-top: 2em;
+        padding: 15px 30px;
+        background-color: #28a745; /* Green button */
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 1.2em;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+    .petition-link:hover {
+        background-color: #218838; /* Darker green on hover */
     }
   </style>
 </head>
 <body>
 <div class="container">
   <nav>
-    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
+    <h1>Nachbarschaft<br>Lärmschutz<br>Königstein/Schneidhain</h1>
     <ul>
       <li>
         <a href="index.html" class="active">Startseite</a>
@@ -43,46 +61,70 @@
         <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
       </li>
       <li>
-        <a href="abgas.html">Abgas</a>
+        <a href="abgas.html">Abgase</a>
       </li>
     </ul>
   </nav>
   <div class="main">
     <p>
-      Unsere Nachbarschaft braucht endlich Schutz, Ruhe – und Gehör.<br>
-      Wir, die Anwohnerinnen und Anwohner der <strong>Wiesbadener Straße</strong>, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung in unserem Wohngebiet. Was hier passiert, ist unzumutbar – für unsere Gesundheit, unsere Lebensqualität und nicht zuletzt unsere Sicherheit.
+      Unsere Nachbarschaft braucht endlich Schutz, Ruhe – und Gehör!
+      <br>
+      Wir, die Anwohnerinnen und Anwohner der **Wiesbadener Straße** und **Bischofs Kaller Straße** in Königstein/Schneidhain, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung in unserem Wohngebiet. Was hier passiert, ist unzumutbar – für unsere Gesundheit, unsere Lebensqualität und nicht zuletzt unsere Sicherheit.
     </p>
+
+    ---
+
     <h3>🚨 Die wichtigsten Probleme im Überblick:</h3>
     <ul class="probleme">
-      <li><b>Überschreitung der Geschwindigkeitsbegrenzung:</b> Trotz der klar ausgeschilderten 30er-Zone rasen Fahrzeuge regelmäßig mit deutlich höherer Geschwindigkeit durch unsere Straße – Tag und Nacht.</li>
-      <li><b>Lärmbelastung rund um die Uhr:</b> Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt.</li>
-      <li><b>Lüften kaum möglich:</b> Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich.</li>
-      <li><b>Garten? Fehlanzeige!</b> Unser eigener Garten kann nicht mehr als Ort der Erholung dienen – das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Nicht denkbar bei diesem Lärmpegel.</li>
-      <li><b>Stau am Morgen – Stress zum Tagesbeginn:</b> Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung.</li>
-      <li><b>Gesundheitliche Belastung:</b> Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aller Bewohnerinnen und Bewohner aus – besonders auf Kinder und ältere Menschen.</li>
+      <li><b>Raserei trotz 30er-Zone:</b> Obwohl die 30er-Zone klar ausgeschildert ist, rasen Fahrzeuge – Tag und Nacht – mit deutlich überhöhter Geschwindigkeit durch unsere Straßen. Das erhöht nicht nur den Lärm, sondern stellt auch eine enorme Gefahr dar.</li>
+      <li><b>Unerträgliche Lärmbelastung:</b> Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt und unsere Häuser erschüttert.</li>
+      <li><b>Lüften kaum möglich:</b> Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich, was die Luftqualität in unseren Häusern massiv beeinträchtigt.</li>
+      <li><b>Garten nicht nutzbar:</b> Unser eigener Garten kann nicht mehr als Ort der Erholung dienen. Das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Bei diesem Lärmpegel undenkbar. Unsere Lebensqualität im eigenen Zuhause ist stark eingeschränkt.</li>
+      <li><b>Morgendlicher Stau und Stress:</b> Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung. Dies führt zu zusätzlichen Abgasen, Lärm und unnötigem Stress für alle.</li>
+      <li><b>Massive gesundheitliche Belastung:</b> Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aller Bewohnerinnen und Bewohner aus – besonders auf Kinder und ältere Menschen. Dies kann zu Schlafstörungen, Konzentrationsproblemen und Herz-Kreislauf-Erkrankungen führen.</li>
     </ul>
+
+    ---
+
     <h3>🚶‍♀️ Gefahr für Fußgänger – besonders für Kinder und Senioren</h3>
+    <p>Unsere Straßen sind für Fußgänger ein gefährliches Pflaster:</p>
     <ul class="gefahr">
-      <li>Es gibt keinen Zebrastreifen oder sichere Überquerungsmöglichkeit – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand.</li>
-      <li>An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine.</li>
-      <li>Fahrradfahrer sind ebenfalls gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind.</li>
+      <li><b>Fehlende sichere Überquerungsmöglichkeiten:</b> Es gibt keinen Zebrastreifen oder sichere Querungsstellen – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand, der täglich Risiken birgt.</li>
+      <li>An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine, was die sichere Querung der Straße zusätzlich erschwert.</li>
+      <li>Auch Fahrradfahrer sind gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind und sie sich den beengten Raum mit schnellfahrenden Fahrzeugen teilen müssen.</li>
     </ul>
+
+    ---
+
     <h3>🛣 Weitere Mängel:</h3>
     <ul class="maengel">
-      <li>Zahlreiche Schlaglöcher: Diese führen dazu, dass LKWs und Transporter bei jeder Fahrt zusätzlichen Lärm erzeugen und möglicherweise Schäden an den Fahrzeugen verursachen.</li>
-      <li>Unzureichende Verkehrsüberwachung: Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können.</li>
+      <li><b>Zahlreiche Schlaglöcher:</b> Diese führen nicht nur zu zusätzlichen Lärmemissionen durch LKWs und Transporter, sondern erhöhen auch den Verschleiß an Fahrzeugen und stellen eine Gefahr für Zweiradfahrer dar.</li>
+      <li><b>Unzureichende Verkehrsüberwachung:</b> Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können. Eine konsequente Überwachung fehlt gänzlich.</li>
     </ul>
-    <h3>✅ Unsere Forderungen:</h3>
+
+    ---
+
+    <h3>✅ Unsere dringenden Forderungen an die Stadtverwaltung und Behörden:</h3>
+    <p>Wir fordern konkrete und sofortige Maßnahmen zur Verbesserung unserer Situation:</p>
     <ul class="forderungen">
-      <li>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen</li>
-      <li>Bauliche Verkehrsberuhigung, z. B. durch Fahrbahnverengungen, Bodenschwellen oder Blumenkübel</li>
-      <li>Einrichtung eines Zebrastreifens oder einer Ampel in zentraler Lage</li>
-      <li>Tempolimit-Kontrolle durch Sensoren oder digitale Anzeigetafeln</li>
-      <li>Sanierung der Straßendecke zur Reduzierung des Lärmpegels</li>
-      <li>Regelmäßige Luft- und Lärmmessungen mit Veröffentlichung der Ergebnisse</li>
-      <li>Einrichtung einer Bürgerbeteiligung zur langfristigen Verkehrsplanung</li>
+      <li><b>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen:</b> Nur eine konsequente Überwachung kann die Einhaltung der Geschwindigkeitsbegrenzung in der 30er-Zone gewährleisten.</li>
+      <li><b>Bauliche Verkehrsberuhigung:</b> Wir benötigen effektive bauliche Maßnahmen wie Fahrbahnverengungen, Bodenschwellen (sogenannte "Berliner Kissen") oder strategisch platzierte Blumenkübel, um den Verkehr nachhaltig zu verlangsamen.</li>
+      <li><b>Einrichtung eines Zebrastreifens oder einer Ampel in zentraler Lage:</b> Um die Sicherheit von Fußgängern, insbesondere von Kindern und Senioren, zu gewährleisten.</li>
+      <li><b>Umfassende Sanierung der Straßendecke:</b> Eine Erneuerung der Fahrbahn ist dringend notwendig, um den Lärmpegel deutlich zu reduzieren, der durch Schlaglöcher und den allgemeinen Zustand der Straße verstärkt wird.</li>
+      <li><b>Regelmäßige Luft- und Lärmmessungen mit Veröffentlichung der Ergebnisse:</b> Transparenz ist hier entscheidend. Wir wollen wissen, wie stark die Belastung tatsächlich ist und ob unsere Forderungen Wirkung zeigen.</li>
+      <li><b>Einrichtung einer Bürgerbeteiligung zur langfristigen Verkehrsplanung:</b> Wir fordern eine aktive Einbindung der Anwohner in die Entwicklung nachhaltiger Verkehrskonzepte für unser Wohngebiet. Unsere Expertise als Betroffene muss gehört werden.</li>
+      <li><b>LKW-Durchfahrtsverbot oder Maut für den Durchgangsverkehr:</b> Ein generelles LKW-Durchfahrtsverbot (ausgenommen Lieferverkehr für Anwohner und lokale Geschäfte) oder die Einführung einer Maut für Lastkraftwagen und Busse, die unsere Straße als Abkürzung von der A3-Abfahrt Niedernhausen zum Bad Homburger Kreuz nutzen, ist unerlässlich. Dies würde den massiven Transitverkehr signifikant reduzieren.</li>
     </ul>
-    <h3>🙌 Wir brauchen deine Unterstützung!</h3>
+
+    ---
+
+    <h3>🙌 Wir brauchen Ihre Unterstützung!</h3>
+    <p>
+      Wir bitten alle Betroffenen und Unterstützer, sich dieser Initiative anzuschließen. Lassen Sie uns gemeinsam für mehr Lebensqualität, Sicherheit und Gesundheit in der Wiesbadener Straße und Bischofs Kaller Straße kämpfen!
+    </p>
+    <a href="https://www.openpetition.de/petition/online/petition-sofortiger-schutz-vor-verkehrs-laerm-und-abgas-belastung-auf-der-wiesbadener-strasse-und-bi" class="petition-link" target="_blank">
+      Hier geht's zur Online-Petition
+    </a>
   </div>
 </div>
 </body>
