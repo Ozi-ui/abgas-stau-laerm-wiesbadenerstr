@@ -4,25 +4,27 @@
     <meta charset="UTF-8">
     <title>Fahrzeugzählung</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <style>
-        /* Einfache, einheitliche Sidebar wie index.html/laerm.html */
-        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7f7;
+            margin: 0;
+        }
         #container {
             max-width: 1200px;
             margin: 40px auto;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 8px #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 12px #bfc7d0;
             display: flex;
             min-height: 80vh;
         }
         .sidebar {
             width: 220px;
-            background: #224e7a;
+            background: #2564a6;  /* wie index.html */
             color: #fff;
-            border-radius: 8px 0 0 8px;
+            border-radius: 10px 0 0 10px;
             padding: 32px 0;
             display: flex;
             flex-direction: column;
@@ -34,14 +36,15 @@
             font-weight: bold;
             margin: 10px 24px;
             font-size: 1.13em;
-            padding: 6px 8px;
+            padding: 7px 12px;
             width: calc(100% - 48px);
             border-radius: 4px;
             transition: background 0.2s;
             display: block;
+            letter-spacing: 0.02em;
         }
         .sidebar a.active, .sidebar a:hover {
-            background: #163c5a;
+            background: #1e4e80;
             text-decoration: underline;
         }
         .main-content {
@@ -49,13 +52,13 @@
             padding: 30px 40px;
         }
         .chart-block { margin-bottom: 50px; }
-        canvas { height: 410px !important; width: 100% !important; }
+        canvas { width: 100% !important; height: 370px !important; }
         #gesamtanzahl { margin: 0 0 20px 0; font-weight: bold; font-size: 1.2em; }
         .hinweis { color: #555; margin: 10px 0 0 0; font-size: 0.97em; }
         .filter-block { margin-bottom: 20px; }
         .pulldown {
             padding: 8px 15px;
-            background-color: #007bff;
+            background-color: #2564a6;
             color: white;
             border: none;
             border-radius: 4px;
@@ -63,21 +66,21 @@
             font-size: 1em;
         }
         .pulldown:focus, .pulldown:hover {
-            background-color: #0056b3;
+            background-color: #1e4e80;
         }
         .input-group { margin-top: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .input-group label { white-space: nowrap; }
         .input-group input[type="datetime-local"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         @media (max-width: 900px) {
             #container { flex-direction: column; }
-            .sidebar { flex-direction: row; width: 100%; border-radius: 8px 8px 0 0;}
+            .sidebar { flex-direction: row; width: 100%; border-radius: 10px 10px 0 0;}
             .sidebar a { margin: 10px; font-size: 1em; width: auto;}
             .main-content { padding: 20px 10px;}
         }
         @media (max-width: 600px) {
             .main-content { padding: 5vw;}
             .input-group { flex-direction: column; align-items: stretch;}
-            canvas { height: 260px !important; }
+            canvas { height: 220px !important; }
         }
     </style>
 </head>
@@ -92,7 +95,7 @@
     <div class="main-content">
         <h1>Fahrzeugzählung</h1>
         <div class="chart-block">
-            <h2 id="balken-chart-title">Fahrzeugaufkommen nach Typ (Filterbar)</h2>
+            <h2 id="balken-chart-title">Fahrzeugaufkommen nach Typ</h2>
             <div class="filter-block">
                 Zeitraum:
                 <select id="balken-zeitraum-preset" class="pulldown">
@@ -101,7 +104,6 @@
                     <option value="last60min">Letzte 60 Minuten</option>
                     <option value="last12h">Letzte 12 Stunden</option>
                     <option value="last24h">Letzte 24 Stunden</option>
-                    <option value="all" selected>Gesamter Verlauf</option>
                 </select>
                 <div class="input-group">
                     <label for="balken-von-datum-zeit">Von:</label>
@@ -124,7 +126,6 @@
                     <option value="last60min">Letzte 60 Minuten</option>
                     <option value="last12h">Letzte 12 Stunden</option>
                     <option value="last24h">Letzte 24 Stunden</option>
-                    <option value="all" selected>Gesamter Verlauf</option>
                 </select>
                 <div class="input-group">
                     <label for="von-datum-zeit">Von:</label>
@@ -260,7 +261,7 @@ function gruppiereZeitverlauf(data, intervalMinuten = 1) {
 async function ladeFahrzeugDaten() {
     alleEintraege = await fetchFahrzeugDaten();
     gefilterteBarEintraege = alleEintraege;
-    renderBarChart(alleEintraege, 'Fahrzeugaufkommen nach Typ (Gesamtdaten)');
+    renderBarChart(alleEintraege, 'Fahrzeugaufkommen nach Typ');
     applyFilters();
 }
 
@@ -288,32 +289,27 @@ function applyBarFilters() {
             return;
         }
         chartTitleBar += ` (Von: ${vonStr || 'Anfang'} Bis: ${bisStr || 'Ende'})`;
-        document.getElementById('balken-zeitraum-preset').value = 'all';
+        document.getElementById('balken-zeitraum-preset').value = 'last10min';
     } else {
         document.getElementById('balken-von-datum-zeit').value = '';
         document.getElementById('balken-bis-datum-zeit').value = '';
-        if (zeitraumPreset === 'all') {
-            filteredEntries = alleEintraege;
-            chartTitleBar += ' (Gesamter Verlauf)';
-        } else if (zeitraumPreset.startsWith('last')) {
-            const now = new Date();
-            let cutoffTime;
-            if (zeitraumPreset.endsWith('min')) {
-                const minutes = parseInt(zeitraumPreset.replace('last', '').replace('min', ''));
-                cutoffTime = new Date(now.getTime() - minutes * 60 * 1000);
-                chartTitleBar += ` (Letzte ${minutes} Minuten)`;
-            } else if (zeitraumPreset.endsWith('h')) {
-                const hours = parseInt(zeitraumPreset.replace('last', '').replace('h', ''));
-                cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
-                chartTitleBar += ` (Letzte ${hours} Stunden)`;
-            }
-            filteredEntries = alleEintraege.filter(e => e.datetime >= cutoffTime);
-            if (filteredEntries.length === 0 && alleEintraege.length > 0) {
-                alert('Keine Daten für den ausgewählten Zeitraum gefunden.');
-                renderBarChart([], 'Fahrzeugaufkommen (Keine Daten)');
-                gefilterteBarEintraege = [];
-                return;
-            }
+        const now = new Date();
+        let cutoffTime;
+        if (zeitraumPreset.endsWith('min')) {
+            const minutes = parseInt(zeitraumPreset.replace('last', '').replace('min', ''));
+            cutoffTime = new Date(now.getTime() - minutes * 60 * 1000);
+            chartTitleBar += ` (Letzte ${minutes} Minuten)`;
+        } else if (zeitraumPreset.endsWith('h')) {
+            const hours = parseInt(zeitraumPreset.replace('last', '').replace('h', ''));
+            cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+            chartTitleBar += ` (Letzte ${hours} Stunden)`;
+        }
+        filteredEntries = alleEintraege.filter(e => e.datetime >= cutoffTime);
+        if (filteredEntries.length === 0 && alleEintraege.length > 0) {
+            alert('Keine Daten für den ausgewählten Zeitraum gefunden.');
+            renderBarChart([], 'Fahrzeugaufkommen (Keine Daten)');
+            gefilterteBarEintraege = [];
+            return;
         }
     }
     gefilterteBarEintraege = filteredEntries;
@@ -347,33 +343,28 @@ function applyFilters() {
         if (diffHours > 24) intervalMinutes = 60;
         else if (diffHours > 4) intervalMinutes = 10;
         else if (diffHours > 1) intervalMinutes = 5;
-        document.getElementById('zeitraum-preset').value = 'all';
+        document.getElementById('zeitraum-preset').value = 'last10min';
     } else {
         document.getElementById('von-datum-zeit').value = '';
         document.getElementById('bis-datum-zeit').value = '';
-        if (zeitraumPreset === 'all') {
-            filteredEntries = alleEintraege;
-            intervalMinutes = 60;
-        } else if (zeitraumPreset.startsWith('last')) {
-            const now = new Date();
-            let cutoffTime;
-            if (zeitraumPreset.endsWith('min')) {
-                const minutes = parseInt(zeitraumPreset.replace('last', '').replace('min', ''));
-                cutoffTime = new Date(now.getTime() - minutes * 60 * 1000);
-                intervalMinutes = 1;
-            } else if (zeitraumPreset.endsWith('h')) {
-                const hours = parseInt(zeitraumPreset.replace('last', '').replace('h', ''));
-                cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
-                if (hours > 24) intervalMinutes = 60;
-                else if (hours > 4) intervalMinutes = 10;
-                else intervalMinutes = 5;
-            }
-            filteredEntries = alleEintraege.filter(e => e.datetime >= cutoffTime);
-            if (filteredEntries.length === 0 && alleEintraege.length > 0) {
-                alert('Keine Daten für den ausgewählten Zeitraum gefunden.');
-                renderLineCharts([], []);
-                return;
-            }
+        const now = new Date();
+        let cutoffTime;
+        if (zeitraumPreset.endsWith('min')) {
+            const minutes = parseInt(zeitraumPreset.replace('last', '').replace('min', ''));
+            cutoffTime = new Date(now.getTime() - minutes * 60 * 1000);
+            intervalMinutes = 1;
+        } else if (zeitraumPreset.endsWith('h')) {
+            const hours = parseInt(zeitraumPreset.replace('last', '').replace('h', ''));
+            cutoffTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
+            if (hours > 24) intervalMinutes = 60;
+            else if (hours > 4) intervalMinutes = 10;
+            else intervalMinutes = 5;
+        }
+        filteredEntries = alleEintraege.filter(e => e.datetime >= cutoffTime);
+        if (filteredEntries.length === 0 && alleEintraege.length > 0) {
+            alert('Keine Daten für den ausgewählten Zeitraum gefunden.');
+            renderLineCharts([], []);
+            return;
         }
     }
     // Daten für Liniendiagramme
@@ -429,30 +420,43 @@ function renderBarChart(data, titleText) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: { display: false },
-                tooltip: { enabled: true },
                 datalabels: {
                     anchor: 'end',
                     align: 'start',
                     font: { weight: 'bold', size: 16 },
                     color: '#333'
+                },
+                tooltip: {
+                    enabled: true,
+                    callbacks: {
+                        label: function(ctx) {
+                            return 'Anzahl: ' + ctx.parsed.y;
+                        }
+                    },
+                    backgroundColor: '#fff',
+                    titleColor: '#2564a6',
+                    bodyColor: '#111',
+                    borderColor: '#2564a6',
+                    borderWidth: 1
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: { display: true, text: 'Anzahl der Fahrzeuge' },
-                    ticks: {
-                        font: { size: 14, weight: 'bold' },
-                        color: "#222"
-                    }
-                },
-                x: {
-                    title: { display: true, text: 'Fahrzeugtyp' },
+                    title: { display: true, text: 'Anzahl der Fahrzeuge', font: { size: 16, weight: 'bold' } },
                     ticks: {
                         font: { size: 15, weight: 'bold' },
                         color: "#222"
-                    }
+                    },
+                    grid: { color: "#d0dae6" }
+                },
+                x: {
+                    title: { display: true, text: 'Fahrzeugtyp', font: { size: 16, weight: 'bold' } },
+                    ticks: {
+                        font: { size: 15, weight: 'bold' },
+                        color: "#222"
+                    },
+                    grid: { color: "#e5eefa" }
                 }
             }
         },
@@ -473,30 +477,49 @@ function renderLineCharts(labels, datasetsAuto, datasetsAndere) {
             plugins: {
                 legend: { position: 'top', align: 'center', labels: { boxWidth: 20, font: { size: 15, weight: 'bold' }, color:'#222' } },
                 title: { display: true, text: 'Fahrzeugdichte: Autos', font: { size: 17, weight:'bold' } },
-                tooltip: { enabled: true }
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y;
+                        }
+                    },
+                    backgroundColor: '#fff',
+                    titleColor: '#2564a6',
+                    bodyColor: '#111',
+                    borderColor: '#2564a6',
+                    borderWidth: 1
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Anzahl Autos pro Intervall', font: { size: 16, weight:'bold' } },
                     ticks: {
-                        font: { size: 14, weight:'bold' },
+                        font: { size: 15, weight:'bold' },
                         color: "#222"
-                    }
+                    },
+                    grid: { color: "#d0dae6" }
                 },
                 x: {
                     title: { display: true, text: 'Zeit (Intervall)', font: { size: 16, weight:'bold' } },
                     ticks: {
-                        font: { size: 13, weight:'bold' },
+                        font: { size: 14, weight:'bold' },
                         color: "#222",
                         autoSkip: true,
-                        maxTicksLimit: 14,
+                        maxTicksLimit: 16,
                         callback: function(val, idx, arr) {
-                            // Zeige Labels lesbar, mit Zeilenumbruch
                             const label = this.getLabelForValue(val);
                             return label.replace(' ', '\n');
                         }
-                    }
+                    },
+                    grid: { color: "#e5eefa" }
                 }
             }
         }
@@ -510,30 +533,49 @@ function renderLineCharts(labels, datasetsAuto, datasetsAndere) {
             plugins: {
                 legend: { position: 'top', align: 'center', labels: { boxWidth: 20, font: { size: 15, weight: 'bold' }, color:'#222' } },
                 title: { display: true, text: 'Fahrzeugdichte: Bus, LKW, Motorrad', font: { size: 17, weight:'bold' } },
-                tooltip: { enabled: true }
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y;
+                        }
+                    },
+                    backgroundColor: '#fff',
+                    titleColor: '#2564a6',
+                    bodyColor: '#111',
+                    borderColor: '#2564a6',
+                    borderWidth: 1
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     title: { display: true, text: 'Anzahl Fahrzeuge pro Intervall', font: { size: 16, weight:'bold' } },
                     ticks: {
-                        font: { size: 14, weight:'bold' },
+                        font: { size: 15, weight:'bold' },
                         color: "#222"
-                    }
+                    },
+                    grid: { color: "#d0dae6" }
                 },
                 x: {
                     title: { display: true, text: 'Zeit (Intervall)', font: { size: 16, weight:'bold' } },
                     ticks: {
-                        font: { size: 13, weight:'bold' },
+                        font: { size: 14, weight:'bold' },
                         color: "#222",
                         autoSkip: true,
-                        maxTicksLimit: 14,
+                        maxTicksLimit: 16,
                         callback: function(val, idx, arr) {
-                            // Zeige Labels lesbar, mit Zeilenumbruch
                             const label = this.getLabelForValue(val);
                             return label.replace(' ', '\n');
                         }
-                    }
+                    },
+                    grid: { color: "#e5eefa" }
                 }
             }
         }
