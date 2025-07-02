@@ -113,16 +113,20 @@
             <ul>
                 <li>
                     <b>CO₂-Gesamtemission pro Stunde (in Gramm):</b>
-                    <p>$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO₂-Faktor Fahrzeugtyp}_i)$</p>
+                    <p>$$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO₂-Faktor Fahrzeugtyp}_i)$$</p>
                     <p>Das Ergebnis wird anschließend von Gramm in Kilogramm umgerechnet ($\text{CO₂-Emission (kg)} = \text{CO₂-Gesamtemission (g)} / 1000$).</p>
                 </li>
                 <li>
                     <b>Feinstaub-Gesamtemission pro Stunde (in Gramm):</b>
-                    <p>$\sum (\text{Anzahl Fahrzeuge gesamt} \times \text{Streckenlänge} \times \text{Feinstaub-Faktor aller Fahrzeuge})$</p>
-                    <p>Hierbei wird ein konstanter Feinstaub-Faktor für alle Fahrzeugtypen angenommen.</p>
+                    <p>$$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{Feinstaub-Faktor Fahrzeugtyp}_i)$$</p>
+                    <p>Hierbei wird der spezifische Feinstaub-Faktor für jeden Fahrzeugtyp verwendet.</p>
                 </li>
             </ul>
-            <p><b>Beispiel:</b> Wenn in einer Stunde 10 Autos erkannt werden, beträgt der CO₂-Ausstoß für Autos: $10 \times 2.5\, \text{km} \times 150\, \text{g/km} = 3750\, \text{g} = 3.75\, \text{kg}$. Der Feinstaub-Ausstoß für diese 10 Autos wäre: $10 \times 2.5\, \text{km} \times 0.005\, \text{g/km} = 0.125\, \text{g}$.</p>
+            <p><b>Beispiel:</b> Wenn in einer Stunde 10 Autos erkannt werden:</p>
+            <ul>
+                <li>Der CO₂-Ausstoß für Autos beträgt: $10 \times 2.5\, \text{km} \times 150\, \text{g/km} = 3750\, \text{g} = 3.75\, \text{kg}$.</li>
+                <li>Der Feinstaub-Ausstoß für diese 10 Autos wäre: $10 \times 2.5\, \text{km} \times 0.005\, \text{g/km} = 0.125\, \text{g}$.</li>
+            </ul>
             <p>Diese Werte werden für jeden Fahrzeugtyp addiert, um die Gesamtstundenwerte zu erhalten.</p>
         </div>
     </div>
@@ -209,13 +213,10 @@ async function ladeUndBerechne() {
         const counts = stundenMap[stunde];
         let co2_g = 0;
         let feinstaub_g = 0;
-        let totalVehicles = 0;
 
         for (const type of fahrzeugTypen) {
             const count = counts[type] || 0;
-            totalVehicles += count;
             co2_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].co2 : 0);
-            // Assuming the same particulate matter factor for all vehicles as per original code
             feinstaub_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].feinstaub : 0);
         }
 
