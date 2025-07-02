@@ -1,89 +1,410 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Nachbarschaft Lärmschutz Wiesbadener Straße</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6fa; color: #222; }
-    .container { display: flex; min-height: 100vh; }
-    nav { width: 270px; background: #1854a3; color: #fff; display: flex; flex-direction: column; padding-top: 32px; box-shadow: 2px 0 12px #0002; position: sticky; top: 0; min-height: 100vh; z-index: 10;}
-    nav h1 { font-size: 1.3em; font-weight: 700; margin: 0 0 2em 0; padding: 0 30px; line-height: 1.2; color: #fff;}
-    nav ul { list-style: none; padding: 0; margin: 0 0 2em 0;}
-    nav li { margin-bottom: 0.3em;}
-    nav a { color: #fff; text-decoration: none; display: block; padding: 14px 36px; font-size: 1.07em; border-left: 4px solid transparent; transition: background 0.19s, border 0.19s; letter-spacing: 0.01em;}
-    nav a.active, nav a:hover { background: #2365c9; border-left: 4px solid #fff;}
-    .main { flex: 1; padding: 44px 5vw 44px 5vw; max-width: 900px; margin: 0 auto; background: #fff; box-shadow: 0 4px 24px #1854a318; border-radius: 0 0 22px 22px;}
-    .main h2 { color: #1854a3; margin-top: 2.1em;}
-    .main h3 { margin-bottom: 0.6em;}
-    @media (max-width: 900px) {
-      .container { flex-direction: column; }
-      nav { width: 100vw; min-height: unset; position: static; box-shadow: none; }
-      .main { padding: 20px 2vw; border-radius: 0 0 10px 10px;}
-    }
-    ul, ol { margin-top: 0.18em; }
-    ul.probleme, ul.forderungen, ul.gefahr, ul.maengel {
-      list-style: disc inside;
-      margin-bottom: 1.2em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Fahrzeugemissionen-Auswertung</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f7f7;
+            margin: 40px;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        #container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 36px;
+            border-radius: 10px;
+            box-shadow: 0 0 16px #c2c2c2;
+        }
+
+        .chart-block {
+            margin-bottom: 55px;
+        }
+
+        .input-row {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav {
+            margin-bottom: 30px;
+            background: #224e7a;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 6px;
+        }
+
+        .nav a {
+            color: #fff;
+            margin-right: 30px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav a:hover {
+            text-decoration: underline;
+        }
+
+        .input-row label {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 800px) {
+            #container {
+                padding: 3vw;
+            }
+
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100%;
+            min-height: 320px;
+            border-radius: 8px;
+            background: #fafcff;
+            box-shadow: 0 2px 8px #dde2ee;
+        }
+
+        #berechnung-erklaerung {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e9f7ff;
+            border-left: 5px solid #1a74d6;
+            border-radius: 5px;
+        }
+
+        #berechnung-erklaerung h3 {
+            margin-top: 0;
+            color: #1a74d6;
+        }
+
+        #berechnung-erklaerung ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #berechnung-erklaerung li {
+            margin-bottom: 8px;
+        }
+
+        #berechnung-erklaerung table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        #berechnung-erklaerung th, #berechnung-erklaerung td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #berechnung-erklaerung th {
+            background-color: #f2f2f2;
+        }
+
+        .MathJax_Display {
+            margin: 1em 0 !important;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <nav>
-    <h1>Nachbarschaft<br>Lärmschutz Wiesbadener Straße</h1>
-    <ul>
-      <li>
-        <a href="index.html" class="active">Startseite</a>
-      </li>
-      <li>
-        <a href="laerm.html">Lärmmessung</a>
-      </li>
-      <li>
-        <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
-      </li>
-      <li>
+<div id="container">
+    <div class="nav">
+        <a href="index.html">Start</a>
+        <a href="laerm.html">Lärmpegel</a>
         <a href="abgas.html">Abgas</a>
-      </li>
-    </ul>
-  </nav>
-  <div class="main">
-    <p>
-      Unsere Nachbarschaft braucht endlich Schutz, Ruhe – und Gehör.<br>
-      Wir, die Anwohnerinnen und Anwohner der <strong>Wiesbadener Straße</strong>, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung in unserem Wohngebiet. Was hier passiert, ist unzumutbar – für unsere Gesundheit, unsere Lebensqualität und nicht zuletzt unsere Sicherheit.
-    </p>
-    <h3>🚨 Die wichtigsten Probleme im Überblick:</h3>
-    <ul class="probleme">
-      <li><b>Überschreitung der Geschwindigkeitsbegrenzung:</b> Trotz der klar ausgeschilderten 30er-Zone rasen Fahrzeuge regelmäßig mit deutlich höherer Geschwindigkeit durch unsere Straße – Tag und Nacht.</li>
-      <li><b>Lärmbelastung rund um die Uhr:</b> Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt.</li>
-      <li><b>Lüften kaum möglich:</b> Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich.</li>
-      <li><b>Garten? Fehlanzeige!</b> Unser eigener Garten kann nicht mehr als Ort der Erholung dienen – das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Nicht denkbar bei diesem Lärmpegel.</li>
-      <li><b>Stau am Morgen – Stress zum Tagesbeginn:</b> Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung.</li>
-      <li><b>Gesundheitliche Belastung:</b> Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aller Bewohnerinnen und Bewohner aus – besonders auf Kinder und ältere Menschen.</li>
-    </ul>
-    <h3>🚶‍♀️ Gefahr für Fußgänger – besonders für Kinder und Senioren</h3>
-    <ul class="gefahr">
-      <li>Es gibt keinen Zebrastreifen oder sichere Überquerungsmöglichkeit – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand.</li>
-      <li>An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine.</li>
-      <li>Fahrradfahrer sind ebenfalls gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind.</li>
-    </ul>
-    <h3>🛣 Weitere Mängel:</h3>
-    <ul class="maengel">
-      <li>Zahlreiche Schlaglöcher: Diese führen dazu, dass LKWs und Transporter bei jeder Fahrt zusätzlichen Lärm erzeugen und möglicherweise Schäden an den Fahrzeugen verursachen.</li>
-      <li>Unzureichende Verkehrsüberwachung: Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können.</li>
-    </ul>
-    <h3>✅ Unsere Forderungen:</h3>
-    <ul class="forderungen">
-      <li>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen</li>
-      <li>Bauliche Verkehrsberuhigung, z. B. durch Fahrbahnverengungen, Bodenschwellen oder Blumenkübel</li>
-      <li>Einrichtung eines Zebrastreifens oder einer Ampel in zentraler Lage</li>
-      <li>Tempolimit-Kontrolle durch Sensoren oder digitale Anzeigetafeln</li>
-      <li>Sanierung der Straßendecke zur Reduzierung des Lärmpegels</li>
-      <li>Regelmäßige Luft- und Lärmmessungen mit Veröffentlichung der Ergebnisse</li>
-      <li>Einrichtung einer Bürgerbeteiligung zur langfristigen Verkehrsplanung</li>
-    </ul>
-    <h3>🙌 Wir brauchen deine Unterstützung!</h3>
-  </div>
+        <a href="stau.html">Stau</a>
+    </div>
+    <h1>Fahrzeugemissionen (stündlich)</h1>
+    <div class="chart-block">
+        <h2>CO₂- und Feinstaubausstoß pro Stunde</h2>
+        <p>Berechnet nach Fahrzeugtyp und Emissionsfaktoren. Streckenlänge: 2,5 km<br>
+        <b style="color:#e13c3c">EU-Feinstaub-Richtwert (PM10 Tagesmittel): 50 µg/m³</b> (rot gestrichelte Linie, zur groben Orientierung)</p>
+        <div class="input-row">
+            <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
+            <select id="zeitraum-select" onchange="setZeitraumSelect()">
+                <option value="1">letzte 1 Stunde</option>
+                <option value="6">letzte 6 Stunden</option>
+                <option value="12">letzte 12 Stunden</option>
+                <option value="24">letzte 24 Stunden</option>
+                <option value="48">letzte 48 Stunden</option>
+                <option value="168">letzte 7 Tage</option>
+            </select>
+            <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
+            <label for="von">von:</label>
+            <input type="datetime-local" id="von" style="margin-right:8px;">
+            <label for="bis">bis:</label>
+            <input type="datetime-local" id="bis" style="margin-right:8px;">
+            <button onclick="zeitraumVonBis()">Anwenden</button>
+        </div>
+        <canvas id="emission-chart" height="320" width="1000"></canvas>
+        <div id="berechnung-erklaerung">
+            <h3>Erläuterung der Emissionsberechnung</h3>
+            <p>Die Emissionen von \(\text{CO}_2\) und Feinstaub werden stündlich basierend auf der Anzahl der erkannten Fahrzeuge und vordefinierten Emissionsfaktoren berechnet. Die angenommene Streckenlänge für jedes Fahrzeug beträgt <b>2,5 km</b>.</p>
+            <h4>Emissionsfaktoren pro Fahrzeug und Kilometer:</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fahrzeugtyp</th>
+                        <th>CO₂-Faktor (g/km)</th>
+                        <th>Feinstaub-Faktor (g/km)</th>
+                    </tr>
+                </thead>
+                <tbody id="emissionsfaktoren-tabelle">
+                </tbody>
+            </table>
+            <h4>Berechnungsformeln:</h4>
+            <ul>
+                <li>
+                    <b>\(\text{CO}_2\)-Gesamtemission pro Stunde (in Gramm):</b>
+                    $$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{CO}_2\text{-Faktor Fahrzeugtyp}_i)$$
+                    Das Ergebnis wird anschließend von Gramm in Kilogramm umgerechnet (\(\text{CO}_2\text{-Emission (kg)} = \text{CO}_2\text{-Gesamtemission (g)} / 1000\)).
+                </li>
+                <li>
+                    <b>Feinstaub-Gesamtemission pro Stunde (in Gramm):</b>
+                    $$\sum_{i} (\text{Anzahl Fahrzeugtyp}_i \times \text{Streckenlänge} \times \text{Feinstaub-Faktor Fahrzeugtyp}_i)$$
+                    Hierbei wird der spezifische Feinstaub-Faktor für jeden Fahrzeugtyp verwendet.
+                </li>
+            </ul>
+            <p><b>Beispiel:</b> Wenn in einer Stunde 10 Autos erkannt werden:</p>
+            <ul>
+                <li>Der \(\text{CO}_2\)-Ausstoß für Autos beträgt: \(10 \times 2.5\,\text{km} \times 150\,\text{g/km} = 3750\,\text{g} = 3.75\,\text{kg}\).</li>
+                <li>Der Feinstaub-Ausstoß für diese 10 Autos wäre: \(10 \times 2.5\,\text{km} \times 0.005\,\text{g/km} = 0.125\,\text{g}\).</li>
+            </ul>
+            <p>Diese Werte werden für jeden Fahrzeugtyp addiert, um die Gesamtstundenwerte zu erhalten.</p>
+        </div>
+    </div>
 </div>
+<script>
+const fahrzeugTypen = ["Auto", "Bus", "LKW", "Motorrad"];
+const emissionsFaktoren = {
+    "Auto": { co2: 150, feinstaub: 0.005 },
+    "Bus": { co2: 800, feinstaub: 0.005 },
+    "LKW": { co2: 1000, feinstaub: 0.005 },
+    "Motorrad": { co2: 90, feinstaub: 0.005 }
+};
+const streckenlaenge_km = 2.5;
+let stundenLabels = [];
+let stundenEmissionenCO2 = [];
+let stundenEmissionenFeinstaub = [];
+let rawStunden = [];
+let chart;
+
+// Plugin für EU-Feinstaub-Grenzlinie (zur groben Orientierung, 0.05g/h)
+const euFeinstaubGrenze = {
+    id: 'euFeinstaubGrenze',
+    afterDraw: chart => {
+        const yAxis = chart.scales['y2'];
+        if (!yAxis) return;
+        const ctx = chart.ctx;
+        // 0.05g entspricht 50mg = 50.000µg (EU Tagesmittel)
+        const y = yAxis.getPixelForValue(0.05);
+        if (y < yAxis.top || y > yAxis.bottom) return; // Nur Linie zeichnen, wenn im sichtbaren Bereich
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(yAxis.left, y);
+        ctx.lineTo(yAxis.right, y);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#e13c3c';
+        ctx.setLineDash([6, 6]);
+        ctx.stroke();
+        ctx.font = "bold 13px Arial";
+        ctx.fillStyle = '#e13c3c';
+        ctx.textAlign = "right";
+        ctx.fillText('EU-Richtwert (PM10 Tagesmittel, 0,05 g/h)', yAxis.right - 10, y - 8);
+        ctx.restore();
+    }
+};
+
+function parseLine(line) {
+    // Format: 2025-06-11, 23:31:17, Auto
+    const parts = line.split(',');
+    if (parts.length < 3) return null;
+    const datePart = parts[0].trim();
+    const timePart = parts[1].trim();
+    let typePart = parts.slice(2).join(',').trim();
+    typePart = typePart.split(' ')[0].replace(/[^A-Za-zÄÖÜäöüß]/g, '');
+    if (!fahrzeugTypen.map(t => t.toLowerCase()).includes(typePart.toLowerCase())) return null;
+    const datetime = datePart + " " + timePart;
+    return { datetime, type: fahrzeugTypen.find(t => t.toLowerCase() === typePart.toLowerCase()) };
+}
+
+async function ladeUndBerechne() {
+    const response = await fetch('Daten/vehicle_counts.txt');
+    const text = await response.text();
+    const lines = text.trim().split('\n');
+    const stundenMap = {};
+    lines.forEach(line => {
+        const parsed = parseLine(line);
+        if (!parsed) return;
+        const { datetime, type } = parsed;
+        const stunde = datetime.substr(0, 13);
+        if (!stundenMap[stunde]) {
+            stundenMap[stunde] = { Auto: 0, Bus: 0, LKW: 0, Motorrad: 0 };
+        }
+        stundenMap[stunde][type] += 1;
+    });
+    const sortedStunden = Object.keys(stundenMap).sort();
+    stundenLabels = [];
+    stundenEmissionenCO2 = [];
+    stundenEmissionenFeinstaub = [];
+    rawStunden = [];
+    for (const stunde of sortedStunden) {
+        const counts = stundenMap[stunde];
+        let co2_g = 0;
+        let feinstaub_g = 0;
+        for (const type of fahrzeugTypen) {
+            const count = counts[type] || 0;
+            co2_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].co2 : 0);
+            feinstaub_g += count * streckenlaenge_km * (emissionsFaktoren[type] ? emissionsFaktoren[type].feinstaub : 0);
+        }
+        stundenLabels.push(stunde + ":00");
+        stundenEmissionenCO2.push((co2_g / 1000).toFixed(2)); // kg
+        stundenEmissionenFeinstaub.push(feinstaub_g.toFixed(3)); // g
+        rawStunden.push({
+            label: stunde + ":00",
+            counts: {...counts},
+            co2_kg: (co2_g / 1000),
+            feinstaub_g: feinstaub_g
+        });
+    }
+    fillEmissionsFaktorenTable(); // Call to fill the new table
+    updateChartPreset(6);
+}
+
+function fillEmissionsFaktorenTable() {
+    const tableBody = document.getElementById('emissionsfaktoren-tabelle');
+    tableBody.innerHTML = ''; // Clear existing rows
+    for (const type of fahrzeugTypen) {
+        const row = tableBody.insertRow();
+        const co2Factor = emissionsFaktoren[type] ? emissionsFaktoren[type].co2 : 'N/A';
+        const feinstaubFactor = emissionsFaktoren[type] ? emissionsFaktoren[type].feinstaub : 'N/A';
+        row.insertCell().textContent = type;
+        row.insertCell().textContent = co2Factor;
+        row.insertCell().textContent = feinstaubFactor;
+    }
+}
+
+function setZeitraumSelect() {
+    document.getElementById('von').value = '';
+    document.getElementById('bis').value = '';
+    const stunden = parseInt(document.getElementById('zeitraum-select').value, 10);
+    updateChartPreset(stunden);
+}
+
+function updateChartPreset(stunden) {
+    const n = Math.max(1, stunden);
+    const len = stundenLabels.length;
+    const start = Math.max(0, len - n);
+    const labels = stundenLabels.slice(start, len);
+    const co2 = stundenEmissionenCO2.slice(start, len);
+    const fs = stundenEmissionenFeinstaub.slice(start, len);
+    renderChart(labels, co2, fs);
+}
+
+function zeitraumVonBis() {
+    document.getElementById('zeitraum-select').value = ''; // Reset select
+    const von = document.getElementById('von').value;
+    const bis = document.getElementById('bis').value;
+    if (!von || !bis) {
+        alert("Bitte 'von' und 'bis' Datum/Zeit wählen.");
+        return;
+    }
+    const vonD = new Date(von);
+    const bisD = new Date(bis);
+    if (vonD > bisD) {
+        alert("'von' muss kleiner als 'bis' sein!");
+        return;
+    }
+    const labels = [];
+    const co2 = [];
+    const fs = [];
+    for (const st of rawStunden) {
+        const dt = new Date(st.label.replace(' ', 'T'));
+        if (dt >= vonD && dt <= bisD) {
+            labels.push(st.label);
+            co2.push(st.co2_kg.toFixed(2));
+            fs.push(st.feinstaub_g.toFixed(3));
+        }
+    }
+    renderChart(labels, co2, fs);
+}
+
+function renderChart(labels, co2data, fsdata) {
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('emission-chart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'CO₂-Ausstoß (kg/h)',
+                    data: co2data,
+                    backgroundColor: 'rgba(26,116,214,0.25)',
+                    borderColor: '#1a74d6',
+                    borderWidth: 1,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Feinstaub-Ausstoß (g/h)',
+                    data: fsdata,
+                    backgroundColor: 'rgba(220, 95, 50, 0.15)',
+                    borderColor: '#e87e38',
+                    borderWidth: 1,
+                    yAxisID: 'y2'
+                }
+            ]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y + (ctx.dataset.label.includes('CO₂') ? ' kg' : ' g');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { color: '#eee' }, ticks: { color: '#555', maxRotation: 60, minRotation: 45 } },
+                y1: {
+                    position: 'left',
+                    title: { display: true, text: 'CO₂ (kg/h)' },
+                    min: 0,
+                    grid: { color: '#eee' },
+                    ticks: { color: '#1a74d6' }
+                },
+                y2: {
+                    position: 'right',
+                    title: { display: true, text: 'Feinstaub (g/h)' },
+                    min: 0,
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#e87e38' }
+                }
+            }
+        },
+        plugins: [euFeinstaubGrenze]
+    });
+}
+
+ladeUndBerechne();
+</script>
 </body>
 </html>
