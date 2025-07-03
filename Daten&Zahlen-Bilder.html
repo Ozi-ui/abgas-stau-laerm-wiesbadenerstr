@@ -35,7 +35,7 @@
             left: 0;
             width: 280px;
             height: 100vh;
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            background: #23477C; /* Dark blue from the image */
             padding: 0;
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
             z-index: 1000;
@@ -43,7 +43,7 @@
         }
 
         .sidebar-header {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); /* Unified color */
+            background: #23477C; /* Dark blue from the image */
             padding: 30px 20px;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -58,28 +58,28 @@
         }
 
         .sidebar-nav {
-            padding: 20px 0;
+            padding: 0; /* Remove padding here, add to nav-item */
         }
 
         .nav-item {
             display: block;
-            padding: 15px 25px;
-            color: #bdc3c7;
+            padding: 15px 25px; /* Padding inside the nav items */
+            color: white; /* White text for all items */
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1); /* Slight white background on hover */
             color: white;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #F57C00; /* Orange border for hover */
         }
 
         .nav-item.active {
-            background: rgba(52, 152, 219, 0.2);
+            background: #2C5F9F; /* Slightly lighter blue for active state */
             color: white;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #F57C00; /* Orange border for active */
         }
 
         .contact-section {
@@ -475,7 +475,7 @@
 
         <div class="sidebar">
             <div class="sidebar-header">
-                <h3>Nachbarschaft Lärmschutz Königstein/Schneidhain</h3>
+                <h3>Nachbarschaft Lärmschutz Königstein/<br>Schneidhain</h3>
             </div>
             <nav class="sidebar-nav">
                 <a href="index.html" class="nav-item active">Startseite</a>
