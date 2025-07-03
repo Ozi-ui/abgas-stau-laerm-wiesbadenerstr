@@ -1,542 +1,665 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Daten&Zahlen-Bilder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --primary-color: #1854a3;
-      --primary-dark: #133d7a;
-      --secondary-color: #28a745;
-      --accent-color: #ff6b35;
-      --text-dark: #2c3e50;
-      --text-light: #6c757d;
-      --background-light: #f8f9fa;
-      --white: #ffffff;
-      --shadow: 0 10px 30px rgba(0,0,0,0.1);
-      --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
-      --border-radius: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engagement für Lebensqualität in Königstein</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            animation: gradientShift 10s ease infinite;
+            margin: 0;
+            padding: 0;
+            padding-left: 280px;
+        }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      color: var(--text-dark);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+            50% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        }
 
-    .container {
-      display: flex;
-      min-height: 100vh;
-      max-width: 1400px;
-      margin: 0 auto;
-      background: var(--white);
-      box-shadow: var(--shadow);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    /* Navigation */
-    nav {
-      width: 320px;
-      background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      display: flex;
-      flex-direction: column;
-      padding: 2rem 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            padding: 0;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
 
-    nav h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0 0 3rem 0;
-      padding: 0 2rem;
-      line-height: 1.3;
-      text-align: center;
-      position: relative;
-    }
+        .sidebar-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    nav h1::after {
-      content: '';
-      position: absolute;
-      bottom: -1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: var(--accent-color);
-      border-radius: 2px;
-    }
+        .sidebar-header h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin: 0;
+            line-height: 1.3;
+            font-weight: 600;
+        }
 
-    nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+        .sidebar-nav {
+            padding: 20px 0;
+        }
 
-    nav li {
-      margin-bottom: 0.5rem;
-    }
+        .nav-item {
+            display: block;
+            padding: 15px 25px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
 
-    nav a {
-      color: var(--white);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: var(--transition);
-      position: relative;
-      opacity: 0.8;
-    }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid #3498db;
+        }
 
-    nav a:hover,
-    nav a.active {
-      background: rgba(255, 255, 255, 0.1);
-      opacity: 1;
-      transform: translateX(5px);
-    }
+        .nav-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            color: white;
+            border-left: 4px solid #3498db;
+        }
 
-    nav a::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 4px;
-      background: var(--accent-color);
-      transform: scaleY(0);
-      transition: var(--transition);
-    }
+        .contact-section {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            text-align: center;
+            animation-delay: 0.1s;
+        }
 
-    nav a.active::before,
-    nav a:hover::before {
-      transform: scaleY(1);
-    }
+        .contact-section h2 {
+            color: white;
+            font-size: 1.8rem;
+        }
 
-    /* Main Content */
-    .main {
-      flex: 1;
-      padding: 3rem 4rem;
-      background: var(--white);
-      overflow-y: auto;
-    }
+        .contact-section h2::before {
+            background: white;
+        }
 
-    .hero {
-      text-align: center;
-      margin-bottom: 4rem;
-      padding: 3rem 2rem;
-      background: linear-gradient(135deg, var(--background-light) 0%, #e3f2fd 100%);
-      border-radius: var(--border-radius);
-      position: relative;
-      overflow: hidden;
-    }
+        /* Bildergalerie Styles */
+        .image-gallery-section {
+            animation-delay: 0.5s;
+        }
 
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(24, 84, 163, 0.05) 0%, transparent 70%);
-      animation: pulse 4s ease-in-out infinite;
-    }
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+        .image-placeholder {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px dashed #cbd5e0;
+            min-height: 250px;
+        }
 
-    .hero h2 {
-      font-size: 2.5rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 700;
-      position: relative;
-      z-index: 1;
-    }
+        .image-placeholder:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
 
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--text-light);
-      max-width: 600px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
+        .image-slot {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            min-height: 250px;
+            padding: 20px;
+            text-align: center;
+        }
 
-    /* Custom content section for your text */
-    .content-section {
-        margin-bottom: 4rem;
-        padding: 2.5rem;
-        background: var(--background-light);
-        border-radius: var(--border-radius);
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
+        .image-text {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
 
-    .content-section h2 {
-        font-size: 2rem;
-        color: var(--primary-color);
-        margin-bottom: 1.5rem;
-        font-weight: 700;
-        border-bottom: 2px solid var(--accent-color);
-        padding-bottom: 0.5rem;
-    }
+        .image-slot p {
+            color: #495057;
+            margin: 0;
+            font-size: 0.9rem;
+        }
 
-    .content-section h3 {
-        font-size: 1.5rem;
-        color: var(--primary-color);
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideInUp 0.8s ease forwards;
+        }
 
-    .content-section p {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        margin-bottom: 1rem;
-        color: var(--text-dark);
-    }
+        @keyframes slideInUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-    .content-section ul {
-        list-style: none;
-        padding-left: 0;
-        margin-top: 1rem;
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation-delay: 0.2s;
+        }
 
-    .content-section ul li {
-        position: relative;
-        padding-left: 1.8rem;
-        margin-bottom: 0.8rem;
-        font-size: 1.1rem;
-        color: var(--text-dark);
-    }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .content-section ul li::before {
-        content: '•'; /* Or any other bullet point like '✓' */
-        color: var(--secondary-color);
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-        top: 0;
-        font-size: 1.3em;
-        line-height: 1;
-    }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-weight: 300;
+        }
 
-    /* Contact Cards */
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
+        .content-section {
+            margin-bottom: 40px;
+            animation-delay: 0.4s;
+        }
 
-    .contact-card {
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 2.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      transition: var(--transition);
-      border: 1px solid rgba(0,0,0,0.05);
-      position: relative;
-      overflow: hidden;
-    }
+        .content-section h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
 
-    .contact-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-    }
+        .content-section h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
 
-    .contact-card:hover {
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-5px);
-    }
+        .intro-text {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            text-align: justify;
+            color: #34495e;
+        }
 
-    .contact-card h3 {
-      font-size: 1.5rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+        }
 
-    .contact-card p {
-      color: var(--text-light);
-      margin-bottom: 1.5rem;
-      font-size: 1rem;
-    }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
 
-    .email-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 2rem;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: var(--white);
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 600;
-      transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(24, 84, 163, 0.3);
-      width: 100%;
-      font-size: 1rem;
-    }
+        .feature-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .email-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(24, 84, 163, 0.4);
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-    }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
 
-    .email-address {
-      font-family: 'Monaco', 'Consolas', monospace;
-      background: var(--background-light);
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      border: 1px solid #e0e0e0;
-      font-size: 0.95rem;
-      color: var(--text-dark);
-      word-break: break-all;
-    }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
 
-    /* Info Section */
-    .info-section {
-      background: var(--background-light);
-      border-radius: var(--border-radius);
-      padding: 2.5rem;
-      margin-bottom: 3rem;
-      border-left: 4px solid var(--accent-color);
-    }
+        .feature-card:hover::before {
+            animation: shine 0.8s ease;
+            opacity: 1;
+        }
 
-    .info-section h3 {
-      font-size: 1.5rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
 
-    .info-section p {
-      color: var(--text-dark);
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-    }
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    .info-section ul {
-      list-style: none;
-      padding: 0;
-    }
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
 
-    .info-section li {
-      padding: 0.5rem 0;
-      color: var(--text-dark);
-      position: relative;
-      padding-left: 1.5rem;
-    }
+        .feature-text {
+            color: #5a6c7d;
+            line-height: 1.5;
+        }
 
-    .info-section li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--secondary-color);
-      font-weight: bold;
-    }
+        .privacy-list {
+            list-style: none;
+            margin: 20px 0;
+        }
 
-    /* Response Time */
-    .response-time {
-      background: linear-gradient(135deg, var(--secondary-color) 0%, #20c997 100%);
-      color: var(--white);
-      padding: 1.5rem;
-      border-radius: var(--border-radius);
-      text-align: center;
-      margin-top: 3rem;
-    }
+        .privacy-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #34495e;
+        }
 
-    .response-time h4 {
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
+        .privacy-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
 
-    .response-time p {
-      font-size: 1rem;
-      opacity: 0.9;
-    }
+        .cta-section {
+            text-align: center;
+            margin-top: 25px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+            animation-delay: 0.6s;
+        }
 
-    /* Mobile Responsive */
-    @media (max-width: 1024px) {
-      .container {
-        flex-direction: column;
-        margin: 1rem;
-        border-radius: var(--border-radius);
-      }
+        .cta-section h2 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
 
-      nav {
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 1.5rem 0;
-      }
+        .cta-section h2::before {
+            background: white;
+        }
 
-      nav ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-      }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
 
-      nav li {
-        margin: 0;
-      }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
 
-      nav a {
-        padding: 0.75rem 1rem;
-        border-radius: var(--border-radius);
-        background: rgba(255,255,255,0.1);
-        margin: 0.25rem;
-      }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
 
-      .main {
-        padding: 2rem 1.5rem;
-      }
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
 
-      .hero h2 {
-        font-size: 2rem;
-      }
+        .location-info {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
 
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+        .location-info h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
 
-    @media (max-width: 768px) {
-      .hero h2 {
-        font-size: 1.8rem;
-      }
+        .location-info p {
+            color: #155724;
+            margin: 0;
+        }
 
-      .hero p {
-        font-size: 1rem;
-      }
+        @media (max-width: 768px) {
+            body {
+                padding-left: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 15px;
+                margin: 10px 0;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
 
-      .main {
-        padding: 1.5rem 1rem;
-      }
+        .floating-element {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(5px);
+            animation: float 6s ease-in-out infinite;
+            z-index: -1;
+        }
 
-      .contact-card {
-        padding: 1.5rem;
-      }
-    }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
 
-    /* Fade in animations */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
+        .floating-element:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
 
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+        .floating-element:nth-child(2) {
+            top: 70%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 10%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <nav>
-    <h1>Nachbarschaft<br>Lärmschutz<br>Königstein/Schneidhain</h1>
-    <ul>
-      <li><a href="index.html">Startseite</a></li>
-      <li><a href="laerm.html">Lärmmessung</a></li>
-      <li><a href="fahrzeuge.html">Fahrzeugaufkommen</a></li>
-      <li><a href="abgas.html">Abgase</a></li>
-      <li><a href="Daten&Zahlen-Bilder.html">Daten&Zahlen-Bilder</a><li>
-      <li><a href="kontakt.html" class="active">Kontakt</a></li>
-    </ul>
-  </nav>
-    <div class="content-section fade-in">
-        <h2>Engagement für Lebensqualität in Königstein – Messung von Verkehr und Lärm</h2>
-        <p>Mein Name ist <strong>Öztürk Görgülü</strong>, ich bin <strong>Diplom-Ingenieur</strong> und lebe seit über 26 Jahren hier in Königstein, direkt an der Wiesbadenstraße. Die Belastung durch den Straßenverkehr, insbesondere durch Lärm, Abgase und Feinstaub, ist ein Thema, das viele von uns betrifft. In Absprache mit zahlreichen Nachbarn habe ich daher die Initiative ergriffen, präzise Daten zu sammeln und eine Petition zu starten, um die Lebensqualität in unserem Quartier nachhaltig zu verbessern.</p>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
 
-        <h3>Innovative Datenerfassung mit KI – transparent und datenschutzkonform</h3>
-        <p>Um eine fundierte Grundlage für unsere Forderungen zu schaffen, habe ich eine <strong>spezielle Software</strong> entwickelt. Diese Anwendung zählt von meinem Fenster aus mithilfe von <strong>Künstlicher Intelligenz (KI)</strong> die vorbeifahrenden Fahrzeuge – ganz genau differenziert nach LKW, PKW, Bus oder Motorrad.</p>
-        <p>Dabei lege ich größten Wert auf <strong>Datenschutz und Privatsphäre</strong>:</p>
-        <ul>
-            <li><strong>Es werden keine Bilder, Videos oder andere persönliche Daten</strong> von Fahrzeugen oder Personen aufgenommen oder gespeichert.</li>
-            <li>Die Software analysiert lediglich die <strong>Art des Fahrzeugs</strong> und registriert das <strong>Fahrgeräusch</strong>, welches in Dezibel (dB) umgewandelt wird.</li>
-        </ul>
+    <div class="container">
+        <div class="card header">
+            <h1>Engagement für Lebensqualität in Königstein</h1>
+            <p class="subtitle">Messung von Verkehr und Lärm</p>
+        </div>
 
-        <h3>Von Daten zu konkreten Fakten: Belastung auf der Strecke Schneidhain bis zum Kreisel</h3>
-        <p>Aus den so ermittelten Zahlen können wir nicht nur die genaue <strong>Fahrzeugdichte</strong> bestimmen, sondern auch eine fundierte Einschätzung der <strong>Abgas- und Feinstaubbelastung</strong> für die Strecke von Schneidhain bis zum Kreisel berechnen. Diese objektiven Daten bilden die Basis unserer Argumentation für notwendige Maßnahmen und unsere anstehende Petition.</p>
-        <p>Wir sind überzeugt, dass wir gemeinsam etwas bewegen können, um unsere Umgebung gesünder und lebenswerter zu gestalten.</p>
-       
-  </div>
-</div>
+        <!-- Navigation Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Nachbarschaft Lärmschutz Königstein/Schneidhain</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#startseite" class="nav-item active">Startseite</a>
+                <a href="#laermmessung" class="nav-item">Lärmmessung</a>
+                <a href="#fahrzeugaufkommen" class="nav-item">Fahrzeugaufkommen</a>
+                <a href="#abgase" class="nav-item">Abgase</a>
+                <a href="#kontakt" class="nav-item">Kontakt</a>
+            </nav>
+        </div>
 
-<script>
-  // Scroll animation
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
+        <div class="card contact-section">
+            <h2>Kontakt & Mitmachen</h2>
+            <p class="intro-text">
+                Haben Sie Fragen, Anregungen oder möchten Sie unsere Initiative unterstützen? Wir freuen uns über jede Nachricht und jeden Beitrag zu unserem gemeinsamen Ziel.
+            </p>
+        </div>
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, observerOptions);
+        <div class="card content-section">
+            <h2>Engagement für Lebensqualität in Königstein – Messung von Verkehr und Lärm</h2>
+            <p class="intro-text">
+                Mein Name ist <span class="highlight">Öztürk Görgülü</span>, ich bin <span class="highlight">Diplom-Ingenieur</span> und lebe seit über 26 Jahren hier in Königstein, direkt an der Wiesbadenstraße. Die Belastung durch den Straßenverkehr, insbesondere durch Lärm, Abgase und Feinstaub, ist ein Thema, das viele von uns betrifft. In Absprache mit zahlreichen Nachbarn habe ich daher die Initiative ergriffen, präzise Daten zu sammeln und eine Petition zu starten, um die Lebensqualität in unserem Quartier nachhaltig zu verbessern.
+            </p>
+            
+            <div class="location-info">
+                <h3>📍 Standort der Messungen</h3>
+                <p>Wiesbadenstraße, Königstein im Taunus - Direkte Messung vom Wohnbereich aus</p>
+            </div>
+        </div>
 
-  // Observe all fade-in elements
-  document.querySelectorAll('.fade-in').forEach(el => {
-    observer.observe(el);
-  });
+        <!-- Bildergalerie Sektion -->
+        <div class="card image-gallery-section">
+            <h2>Bildergalerie</h2>
+            <p class="intro-text">
+                Hier finden Sie Bilder von unseren Messungen, der Verkehrssituation und der Umgebung.
+            </p>
+            <div class="image-gallery">
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 1</span>
+                        <p>Messaufbau</p>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 2</span>
+                        <p>Verkehrssituation</p>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 3</span>
+                        <p>Wiesbadenstraße</p>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 4</span>
+                        <p>Datenerfassung</p>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 5</span>
+                        <p>Analyseergebnisse</p>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    <div class="image-slot">
+                        <span class="image-text">Bild 6</span>
+                        <p>Umgebung</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  // Add some initial delay for hero
-  setTimeout(() => {
-    document.querySelector('.hero').classList.add('visible');
-  }, 200);
+        <div class="card content-section">
+            <h2>Innovative Datenerfassung mit KI</h2>
+            <p class="intro-text">
+                Um eine fundierte Grundlage für unsere Forderungen zu schaffen, habe ich eine <span class="highlight">spezielle Software</span> entwickelt. Diese Anwendung zählt von meinem Fenster aus mithilfe von <span class="highlight">Künstlicher Intelligenz (KI)</span> die vorbeifahrenden Fahrzeuge – ganz genau differenziert nach LKW, PKW, Bus oder Motorrad.
+            </p>
 
-  // Copy email to clipboard functionality
-  document.querySelectorAll('.email-address').forEach(emailDiv => {
-    emailDiv.style.cursor = 'pointer';
-    emailDiv.title = 'Klicken zum Kopieren';
-    
-    emailDiv.addEventListener('click', function() {
-      const email = this.textContent;
-      navigator.clipboard.writeText(email).then(() => {
-        const originalText = this.textContent;
-        this.textContent = 'E-Mail kopiert!';
-        this.style.background = '#d4edda';
-        this.style.color = '#155724';
-        
-        setTimeout(() => {
-          this.textContent = originalText;
-          this.style.background = '';
-          this.style.color = '';
-        }, 2000);
-      });
-    });
-  });
-</script>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚗</div>
+                    <div class="feature-title">Fahrzeugklassifizierung</div>
+                    <div class="feature-text">Automatische Unterscheidung zwischen LKW, PKW, Bus und Motorrad durch KI-Analyse</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔊</div>
+                    <div class="feature-title">Lärmmessung</div>
+                    <div class="feature-text">Präzise Erfassung der Fahrgeräusche in Dezibel (dB) für objektive Lärmanalyse</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Datenanalyse</div>
+                    <div class="feature-text">Berechnung von Fahrzeugdichte, Abgas- und Feinstaubbelastung basierend auf gesammelten Daten</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px; margin-bottom: 20px; color: #2c3e50;">Datenschutz und Privatsphäre stehen an erster Stelle:</h3>
+            <ul class="privacy-list">
+                <li><strong>Es werden keine Bilder, Videos oder andere persönliche Daten</strong> von Fahrzeugen oder Personen aufgenommen oder gespeichert.</li>
+                <li>Die Software analysiert lediglich die <strong>Art des Fahrzeugs</strong> und registriert das <strong>Fahrgeräusch</strong>, welches in Dezibel (dB) umgewandelt wird.</li>
+                <li>Vollständige Anonymisierung aller erfassten Daten</li>
+                <li>Keine Speicherung personenbezogener Informationen</li>
+            </ul>
+        </div>
+
+        <div class="card content-section">
+            <h2>Von Daten zu konkreten Fakten</h2>
+            <p class="intro-text">
+                Aus den so ermittelten Zahlen können wir nicht nur die genaue <span class="highlight">Fahrzeugdichte</span> bestimmen, sondern auch eine fundierte Einschätzung der <span class="highlight">Abgas- und Feinstaubbelastung</span> für die Strecke von Schneidhain bis zum Kreisel berechnen. Diese objektiven Daten bilden die Basis unserer Argumentation für notwendige Maßnahmen und unsere anstehende Petition.
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Kontinuierliche Überwachung</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Fahrzeugkategorien</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Datenschutzkonform</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">26+</div>
+                    <div class="stat-label">Jahre vor Ort</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card cta-section">
+            <h2>Gemeinsam für eine bessere Zukunft</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 30px;">
+                Wir sind überzeugt, dass wir gemeinsam etwas bewegen können, um unsere Umgebung gesünder und lebenswerter zu gestalten. Durch präzise Datenerfassung und wissenschaftlich fundierte Argumente schaffen wir die Grundlage für wirksame Veränderungen.
+            </p>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🤝</div>
+                    <div>Nachbarschaftliche Zusammenarbeit</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📈</div>
+                    <div>Wissenschaftliche Datengrundlage</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🌱</div>
+                    <div>Nachhaltige Verbesserungen</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling animation on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationDelay = '0s';
+                        entry.target.style.animationFillMode = 'forwards';
+                    }
+                });
+            });
+
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+
+            // Add subtle parallax effect to floating elements
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const rate = scrolled * -0.5;
+                
+                document.querySelectorAll('.floating-element').forEach((element, index) => {
+                    element.style.transform = `translateY(${rate * (index + 1) * 0.1}px)`;
+                });
+            });
+        });
+    </script>
 </body>
 </html>
