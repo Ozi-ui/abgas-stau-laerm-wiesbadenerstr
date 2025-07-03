@@ -1,3 +1,6 @@
+I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box next to the "Fahrzeugerfassung" (Vehicle Detection) box. I've used CSS Flexbox to arrange them side-by-side.
+
+```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -325,6 +328,32 @@
             font-size: 1.2rem;
         }
 
+        .data-display-container {
+            display: flex;
+            flex-wrap: wrap; /* Allows boxes to wrap on smaller screens */
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .data-display-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1; /* Allows boxes to grow and shrink */
+            min-width: 280px; /* Minimum width for each box before wrapping */
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            color: #34495e;
+        }
+
+        .data-display-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+
         .cta-section {
             text-align: center;
             margin-top: 25px;
@@ -424,6 +453,10 @@
             
             .image-gallery {
                 grid-template-columns: 1fr;
+            }
+
+            .data-display-container {
+                flex-direction: column; /* Stack boxes vertically on small screens */
             }
         }
 
@@ -552,6 +585,28 @@
                 <li>Vollständige Anonymisierung aller erfassten Daten</li>
                 <li>Keine Speicherung personenbezogener Informationen Kennzeichen oder sonstige Eigenschaften von Fahrzeugen</li>
             </ul>
+
+            <div class="data-display-container">
+                <div class="data-display-box">
+                    <h3>Fahrzeugerfassung</h3>
+                    2025-06-17, 20:55:27, Auto
+                    2025-06-17, 20:55:40, Auto
+                    2025-06-17, 20:56:07, LKW
+                    2025-06-17, 20:56:11, Bus
+                    2025-06-17, 20:57:08, Auto
+                    2025-06-17, 20:57:12, Motorrad
+                </div>
+                <div class="data-display-box">
+                    <h3>Lärmerfassung</h3>
+                    2025-07-01 20:52:41 - Aktueller Pegel: 68.60 dB
+                    2025-07-01 20:52:42 - Aktueller Pegel: 71.14 dB
+                    2025-07-01 20:52:42 - Aktueller Pegel: 71.57 dB
+                    2025-07-01 20:52:42 - Aktueller Pegel: 70.43 dB
+                    2025-07-01 20:52:43 - Aktueller Pegel: 68.33 dB
+                    2025-07-01 20:52:43 - Aktueller Pegel: 68.92 dB
+                    2025-07-01 20:52:44 - Aktueller Pegel: 71.25 dB
+                </div>
+            </div>
         </div>
 
         <div class="card content-section">
@@ -612,3 +667,4 @@
     </script>
 </body>
 </html>
+```
