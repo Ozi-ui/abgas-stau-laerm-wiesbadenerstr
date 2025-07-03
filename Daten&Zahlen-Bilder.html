@@ -357,17 +357,23 @@
             border: 1px solid #e9ecef;
             border-radius: 8px;
             padding: 20px;
-            flex: 1; /* Allows boxes to grow and shrink */
-            min-width: 280px; /* Default minimum width */
             font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
+            white-space: nowrap; /* Prevent text from wrapping */
+            overflow: hidden; /* Hide overflow if text is too long (shouldn't happen with font-size adjust) */
+            text-overflow: ellipsis; /* Add ellipsis if text is clipped (just in case) */
             color: #34495e;
             text-align: left; /* Left align content */
+            font-size: 0.9em; /* Slightly smaller font to help fit content */
         }
         
-        .data-display-box.narrow {
-            flex: 0 0 350px; /* Specific width for the left box */
-            max-width: 350px; /* Ensure it doesn't grow too much */
+        .data-display-box.fahrzeugerfassung {
+            flex: 0 0 300px; /* Fixed width for Fahrzeugerfassung */
+            max-width: 300px;
+        }
+
+        .data-display-box.laermerfassung {
+            flex: 0 0 480px; /* Fixed width for Lärmerfassung to prevent wrap */
+            max-width: 480px;
         }
 
         .data-display-box h3 {
@@ -375,6 +381,7 @@
             margin-bottom: 15px;
             font-size: 1.2rem;
             text-align: left; /* Ensure heading is left-aligned */
+            white-space: normal; /* Allow heading to wrap if needed */
         }
 
 
@@ -444,7 +451,7 @@
             margin: 0;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) { /* Adjusted breakpoint for wider boxes */
             body {
                 padding-left: 0;
             }
@@ -482,9 +489,13 @@
             .data-display-container {
                 flex-direction: column; /* Stack boxes vertically on small screens */
             }
-            .data-display-box.narrow {
-                flex: 1 1 auto; /* Reset flex for narrow box on small screens */
+            .data-display-box.fahrzeugerfassung,
+            .data-display-box.laermerfassung {
+                flex: 1 1 auto; /* Allow them to fill width on small screens */
                 max-width: 100%;
+                white-space: normal; /* Allow text to wrap again on small screens if necessary */
+                overflow: visible;
+                text-overflow: clip;
             }
         }
 
@@ -616,7 +627,7 @@
 
             <h3 class="data-overall-heading">Hier die erfasste Daten:</h3>
             <div class="data-display-container">
-                <div class="data-display-box narrow">
+                <div class="data-display-box fahrzeugerfassung">
                     <h3>Fahrzeugerfassung</h3>
                     2025-06-17, 20:55:27, Auto
                     2025-06-17, 20:55:40, Auto
@@ -625,7 +636,7 @@
                     2025-06-17, 20:57:08, Auto
                     2025-06-17, 20:57:12, Motorrad
                 </div>
-                <div class="data-display-box">
+                <div class="data-display-box laermerfassung">
                     <h3>Lärmerfassung</h3>
                     2025-07-01 20:52:41 - Aktueller Pegel: 68.60 dB
                     2025-07-01 20:52:42 - Aktueller Pegel: 71.14 dB
