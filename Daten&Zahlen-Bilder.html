@@ -1,4 +1,29 @@
-<!DOCTYPE html>
+<!-- Navigation Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Nachbarschaft Lärmschutz Königstein/Schneidhain</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">Startseite</a>
+                <a href="laerm.html" class="nav-item">Lärmmessung</a>
+                <a href="fahrzeuge.html" class="nav-item">Fahrzeugaufkommen</a>
+                <a href="abgas.html" class="nav-item">Abgase</a>
+                <a href="Daten&Zahlen-Bilder.html" class="nav-item">Daten&Zahlen-Bilder</a>
+                <a href="kontakt.html" class="nav-item">Kontakt</a>
+            </nav>
+        </div>
+
+        <div class="card content-section">
+            <h2>Engagement für Lebensqualität in Königstein – Messung von Verkehr und Lärm</h2>
+            <p class="intro-text">
+                Mein Name ist <span class="highlight">Öztürk Görgülü</span>, ich bin <span class="highlight">Diplom-Ingenieur</span> und lebe seit über 26 Jahren hier in Königstein, direkt an der Wiesbadenstraße. Die Belastung durch den Straßenverkehr, insbesondere durch Lärm, Abgase und Feinstaub, ist ein Thema, das viele von uns betrifft. In Absprache mit zahlreichen Nachbarn habe ich daher die Initiative ergriffen, präzise Daten zu sammeln und eine Petition zu starten, um die Lebensqualität in unserem Quartier nachhaltig zu verbessern.
+            </p>
+            
+            <div class="location-info">
+                <h3>📍 Standort der Messungen</h3>
+                <p>Wiesbadenstraße, Königstein im Taunus - Direkte Messung vom Wohnbereich aus</p>
+            </div>
+        </div><!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -15,17 +40,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: white;
             min-height: 100vh;
-            animation: gradientShift 10s ease infinite;
             margin: 0;
             padding: 0;
             padding-left: 280px;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-            50% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         }
 
         .container {
@@ -104,9 +123,28 @@
             background: white;
         }
 
-        /* Bildergalerie Styles */
-        .image-gallery-section {
-            animation-delay: 0.5s;
+        /* Simple Info Box */
+        .simple-info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .simple-info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .simple-info-box p {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .simple-info-box p:last-child {
+            margin-bottom: 0;
         }
 
         .image-gallery {
@@ -117,12 +155,11 @@
         }
 
         .image-placeholder {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: #f8f9fa;
             border-radius: 15px;
             overflow: hidden;
             transition: all 0.3s ease;
-            border: 2px dashed #cbd5e0;
-            min-height: 250px;
+            border: 1px solid #dee2e6;
         }
 
         .image-placeholder:hover {
@@ -130,28 +167,19 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .image-slot {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            min-height: 250px;
-            padding: 20px;
-            text-align: center;
+        .gallery-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
         }
 
-        .image-text {
-            font-size: 1.2rem;
-            color: #6c757d;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .image-slot p {
-            color: #495057;
+        .image-placeholder p {
+            padding: 15px;
             margin: 0;
+            text-align: center;
+            color: #495057;
             font-size: 0.9rem;
+            background: white;
         }
 
         .card {
@@ -555,24 +583,11 @@
                 Um eine fundierte Grundlage für unsere Forderungen zu schaffen, habe ich eine <span class="highlight">spezielle Software</span> entwickelt. Diese Anwendung zählt von meinem Fenster aus mithilfe von <span class="highlight">Künstlicher Intelligenz (KI)</span> die vorbeifahrenden Fahrzeuge – ganz genau differenziert nach LKW, PKW, Bus oder Motorrad.
             </p>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🚗</div>
-                    <div class="feature-title">Fahrzeugklassifizierung</div>
-                    <div class="feature-text">Automatische Unterscheidung zwischen LKW, PKW, Bus und Motorrad durch KI-Analyse</div>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🔊</div>
-                    <div class="feature-title">Lärmmessung</div>
-                    <div class="feature-text">Erfassung der Fahrgeräusche in Dezibel (dB) für objektive Lärmanalyse</div>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <div class="feature-title">Datenanalyse</div>
-                    <div class="feature-text">Berechnung von Fahrzeugdichte, Abgas- und Feinstaubbelastung basierend auf gesammelten Daten</div>
-                </div>
+            <div class="simple-info-box">
+                <h3>Funktionsumfang der KI-Software</h3>
+                <p><strong>Fahrzeugklassifizierung:</strong> Automatische Unterscheidung zwischen LKW, PKW, Bus und Motorrad durch KI-Analyse</p>
+                <p><strong>Lärmmessung:</strong> Präzise Erfassung der Fahrgeräusche in Dezibel (dB) für objektive Lärmanalyse</p>
+                <p><strong>Datenanalyse:</strong> Berechnung von Fahrzeugdichte, Abgas- und Feinstaubbelastung basierend auf gesammelten Daten</p>
             </div>
 
             <h3 style="margin-top: 40px; margin-bottom: 20px; color: #2c3e50;">Datenschutz und Privatsphäre stehen an erster Stelle:</h3>
