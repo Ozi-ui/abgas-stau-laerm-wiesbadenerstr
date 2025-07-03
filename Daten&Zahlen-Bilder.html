@@ -1,6 +1,3 @@
-I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box next to the "Fahrzeugerfassung" (Vehicle Detection) box. I've used CSS Flexbox to arrange them side-by-side.
-
-```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -328,6 +325,26 @@ I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box ne
             font-size: 1.2rem;
         }
 
+        .data-overall-heading {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .data-overall-heading::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
         .data-display-container {
             display: flex;
             flex-wrap: wrap; /* Allows boxes to wrap on smaller screens */
@@ -341,16 +358,23 @@ I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box ne
             border-radius: 8px;
             padding: 20px;
             flex: 1; /* Allows boxes to grow and shrink */
-            min-width: 280px; /* Minimum width for each box before wrapping */
+            min-width: 280px; /* Default minimum width */
             font-family: 'Courier New', monospace;
             white-space: pre-wrap;
             color: #34495e;
+            text-align: left; /* Left align content */
+        }
+        
+        .data-display-box.narrow {
+            flex: 0 0 350px; /* Specific width for the left box */
+            max-width: 350px; /* Ensure it doesn't grow too much */
         }
 
         .data-display-box h3 {
             color: #2c3e50;
             margin-bottom: 15px;
             font-size: 1.2rem;
+            text-align: left; /* Ensure heading is left-aligned */
         }
 
 
@@ -457,6 +481,10 @@ I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box ne
 
             .data-display-container {
                 flex-direction: column; /* Stack boxes vertically on small screens */
+            }
+            .data-display-box.narrow {
+                flex: 1 1 auto; /* Reset flex for narrow box on small screens */
+                max-width: 100%;
             }
         }
 
@@ -586,8 +614,9 @@ I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box ne
                 <li>Keine Speicherung personenbezogener Informationen Kennzeichen oder sonstige Eigenschaften von Fahrzeugen</li>
             </ul>
 
+            <h3 class="data-overall-heading">Hier die erfasste Daten:</h3>
             <div class="data-display-container">
-                <div class="data-display-box">
+                <div class="data-display-box narrow">
                     <h3>Fahrzeugerfassung</h3>
                     2025-06-17, 20:55:27, Auto
                     2025-06-17, 20:55:40, Auto
@@ -667,4 +696,3 @@ I've updated the HTML to include a new "Lärmerfassung" (Noise Detection) box ne
     </script>
 </body>
 </html>
-```
