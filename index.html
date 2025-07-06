@@ -1,579 +1,579 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Nachbarschaft Lärmschutz Wiesbadener und Bischof Kaller Straße</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --primary-color: #1854a3;
-      --primary-dark: #133d7a;
-      --secondary-color: #28a745;
-      --accent-color: #ff6b35;
-      --text-dark: #2c3e50;
-      --text-light: #6c757d;
-      --background-light: #f8f9fa;
-      --white: #ffffff;
-      --shadow: 0 10px 30px rgba(0,0,0,0.1);
-      --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
-      --border-radius: 12px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+  <meta charset="UTF-8">
+  <title>Nachbarschaft Lärmschutz Wiesbadener und Bischof Kaller Straße</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary-color: #1854a3;
+      --primary-dark: #133d7a;
+      --secondary-color: #28a745;
+      --accent-color: #ff6b35;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --background-light: #f8f9fa;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(0,0,0,0.1);
+      --shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      color: var(--text-dark);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
 
-    .container {
-      display: flex;
-      min-height: 100vh;
-      max-width: 1400px;
-      margin: 0 auto;
-      background: var(--white);
-      box-shadow: var(--shadow);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-    }
+    .container {
+      display: flex;
+      min-height: 100vh;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
 
-    /* Navigation */
-    nav {
-      width: 320px;
-      background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: var(--white);
-      display: flex;
-      flex-direction: column;
-      padding: 2rem 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
+    /* Navigation */
+    nav {
+      width: 320px;
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
 
-    nav h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0 0 3rem 0;
-      padding: 0 2rem;
-      line-height: 1.3;
-      text-align: center;
-      position: relative;
-    }
+    nav h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 3rem 0;
+      padding: 0 2rem;
+      line-height: 1.3;
+      text-align: center;
+      position: relative;
+    }
 
-    nav h1::after {
-      content: '';
-      position: absolute;
-      bottom: -1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 3px;
-      background: var(--accent-color);
-      border-radius: 2px;
-    }
+    nav h1::after {
+      content: '';
+      position: absolute;
+      bottom: -1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
 
-    nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-    nav li {
-      margin-bottom: 0.5rem;
-    }
+    nav li {
+      margin-bottom: 0.5rem;
+    }
 
-    nav a {
-      color: var(--white);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: var(--transition);
-      position: relative;
-      opacity: 0.8;
-    }
+    nav a {
+      color: var(--white);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      opacity: 0.8;
+    }
 
-    nav a:hover,
-    nav a.active {
-      background: rgba(255, 255, 255, 0.1);
-      opacity: 1;
-      transform: translateX(5px);
-    }
+    nav a:hover,
+    nav a.active {
+      background: rgba(255, 255, 255, 0.1);
+      opacity: 1;
+      transform: translateX(5px);
+    }
 
-    nav a::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 4px;
-      background: var(--accent-color);
-      transform: scaleY(0);
-      transition: var(--transition);
-    }
+    nav a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--accent-color);
+      transform: scaleY(0);
+      transition: var(--transition);
+    }
 
-    nav a.active::before,
-    nav a:hover::before {
-      transform: scaleY(1);
-    }
+    nav a.active::before,
+    nav a:hover::before {
+      transform: scaleY(1);
+    }
 
-    /* Main Content */
-    .main {
-      flex: 1;
-      padding: 3rem 4rem;
-      background: var(--white);
-      overflow-y: auto;
-    }
+    /* Main Content */
+    .main {
+      flex: 1;
+      padding: 3rem 4rem;
+      background: var(--white);
+      overflow-y: auto;
+    }
 
-    .hero {
-      text-align: center;
-      margin-bottom: 4rem;
-      padding: 3rem 2rem;
-      background: linear-gradient(135deg, var(--background-light) 0%, #e3f2fd 100%);
-      border-radius: var(--border-radius);
-      position: relative;
-      overflow: hidden;
-    }
+    .hero {
+      text-align: center;
+      margin-bottom: 4rem;
+      padding: 3rem 2rem;
+      background: linear-gradient(135deg, var(--background-light) 0%, #e3f2fd 100%);
+      border-radius: var(--border-radius);
+      position: relative;
+      overflow: hidden;
+    }
 
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(24, 84, 163, 0.05) 0%, transparent 70%);
-      animation: pulse 4s ease-in-out infinite;
-    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(24, 84, 163, 0.05) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+    }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
 
-    .hero h2 {
-      font-size: 2.5rem;
-      color: var(--primary-color);
-      margin-bottom: 1rem;
-      font-weight: 700;
-      position: relative;
-      z-index: 1;
-    }
+    .hero h2 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
 
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--text-light);
-      max-width: 600px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
 
-    /* Section Styling */
-    .section {
-      margin-bottom: 4rem;
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 2.5rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      transition: var(--transition);
-      border: 1px solid rgba(0,0,0,0.05);
-    }
+    /* Section Styling */
+    .section {
+      margin-bottom: 4rem;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 2.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: var(--transition);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
 
-    .section:hover {
-      box-shadow: var(--shadow-hover);
-      transform: translateY(-5px);
-    }
+    .section:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-5px);
+    }
 
-    .section h3 {
-      font-size: 1.8rem;
-      color: var(--primary-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
+    .section h3 {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
 
-    .section p {
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--text-dark);
-      margin-bottom: 1.5rem;
-    }
+    .section p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--text-dark);
+      margin-bottom: 1.5rem;
+    }
 
-    /* Lists */
-    .problem-list,
-    .demand-list,
-    .danger-list,
-    .defect-list {
-      list-style: none;
-      padding: 0;
-      margin: 1.5rem 0;
-    }
+    /* Lists */
+    .problem-list,
+    .demand-list,
+    .danger-list,
+    .defect-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
 
-    .problem-list li,
-    .demand-list li,
-    .danger-list li,
-    .defect-list li {
-      background: var(--background-light);
-      margin-bottom: 1rem;
-      padding: 1.5rem;
-      border-radius: var(--border-radius);
-      border-left: 4px solid var(--accent-color);
-      transition: var(--transition);
-      position: relative;
-    }
+    .problem-list li,
+    .demand-list li,
+    .danger-list li,
+    .defect-list li {
+      background: var(--background-light);
+      margin-bottom: 1rem;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      border-left: 4px solid var(--accent-color);
+      transition: var(--transition);
+      position: relative;
+    }
 
-    .problem-list li:hover,
-    .demand-list li:hover,
-    .danger-list li:hover,
-    .defect-list li:hover {
-      background: #f1f8ff;
-      transform: translateX(5px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
+    .problem-list li:hover,
+    .demand-list li:hover,
+    .danger-list li:hover,
+    .defect-list li:hover {
+      background: #f1f8ff;
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
 
-    .problem-list li::before {
-      position: absolute;
-      left: -15px;
-      top: 1.5rem;
-      background: var(--white);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+    .problem-list li::before {
+      position: absolute;
+      left: -15px;
+      top: 1.5rem;
+      background: var(--white);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
 
-    .danger-list li::before {
-      content: '⚠️';
-    }
+    .danger-list li::before {
+      }
 
-    .defect-list li::before {
-      content: '🔧';
-    }
+    .defect-list li::before {
+      content: '🔧';
+    }
 
-    .demand-list li::before {
-      content: '✅';
-    }
+    .demand-list li::before {
+      }
 
-    .problem-list li b,
-    .demand-list li b,
-    .danger-list li b,
-    .defect-list li b {
-      color: var(--primary-color);
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
+    .problem-list li b,
+    .demand-list li b,
+    .danger-list li b,
+    .defect-list li b {
+      color: var(--primary-color);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
 
-    /* Petition Button */
-    .petition-container {
-      text-align: center;
-      margin: 4rem 0;
-      padding: 3rem;
-      background: linear-gradient(135deg, var(--secondary-color) 0%, #20c997 100%);
-      border-radius: var(--border-radius);
-      position: relative;
-      overflow: hidden;
-    }
+    /* Petition Button */
+    .petition-container {
+      text-align: center;
+      margin: 4rem 0;
+      padding: 3rem;
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #20c997 100%);
+      border-radius: var(--border-radius);
+      position: relative;
+      overflow: hidden;
+    }
 
-    .petition-container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: rotate 20s linear infinite;
-    }
+    .petition-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
 
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-    .petition-container h3 {
-      color: var(--white);
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      position: relative;
-      z-index: 1;
-    }
+    .petition-container h3 {
+      color: var(--white);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
 
-    .petition-container p {
-      color: var(--white);
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-      position: relative;
-      z-index: 1;
-    }
+    .petition-container p {
+      color: var(--white);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
 
-    .petition-link {
-      display: inline-block;
-      padding: 1rem 2.5rem;
-      background: var(--white);
-      color: var(--secondary-color);
-      text-decoration: none;
-      border-radius: 50px;
-      font-size: 1.2rem;
-      font-weight: 600;
-      transition: var(--transition);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      position: relative;
-      z-index: 1;
-    }
+    .petition-link {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: var(--white);
+      color: var(--secondary-color);
+      text-decoration: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: var(--transition);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1;
+    }
 
-    .petition-link:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      background: #f8f9fa;
-    }
+    .petition-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      background: #f8f9fa;
+    }
 
-    .petition-link i {
-      margin-left: 0.5rem;
-    }
+    .petition-link i {
+      margin-left: 0.5rem;
+    }
 
-    /* Mobile Responsive */
-    @media (max-width: 1024px) {
-      .container {
-        flex-direction: column;
-        margin: 1rem;
-        border-radius: var(--border-radius);
-      }
+    /* Mobile Responsive */
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+        margin: 1rem;
+        border-radius: var(--border-radius);
+      }
 
-      nav {
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 1.5rem 0;
-      }
+      nav {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 1.5rem 0;
+      }
 
-      nav ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-      }
+      nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
 
-      nav li {
-        margin: 0;
-      }
+      nav li {
+        margin: 0;
+      }
 
-      nav a {
-        padding: 0.75rem 1rem;
-        border-radius: var(--border-radius);
-        background: rgba(255,255,255,0.1);
-        margin: 0.25rem;
-      }
+      nav a {
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        background: rgba(255,255,255,0.1);
+        margin: 0.25rem;
+      }
 
-      .main {
-        padding: 2rem 1.5rem;
-      }
+      .main {
+        padding: 2rem 1.5rem;
+      }
 
-      .hero h2 {
-        font-size: 2rem;
-      }
+      .hero h2 {
+        font-size: 2rem;
+      }
 
-      .section {
-        padding: 1.5rem;
-      }
-    }
+      .section {
+        padding: 1.5rem;
+      }
+    }
 
-    @media (max-width: 768px) {
-      .hero h2 {
-        font-size: 1.8rem;
-      }
+    @media (max-width: 768px) {
+      .hero h2 {
+        font-size: 1.8rem;
+      }
 
-      .hero p {
-        font-size: 1rem;
-      }
+      .hero p {
+        font-size: 1rem;
+      }
 
-      .section h3 {
-        font-size: 1.5rem;
-      }
+      .section h3 {
+        font-size: 1.5rem;
+      }
 
-      .main {
-        padding: 1.5rem 1rem;
-      }
-    }
+      .main {
+        padding: 1.5rem 1rem;
+      }
+    }
 
-    /* Scroll animations */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
+    /* Scroll animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
 
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-  <nav>
-    <h1>Nachbarschaft<br>Lärmschutz<br>Königstein/Schneidhain</h1>
-    <ul>
-      <li><a href="index.html" class="active">Startseite</a></li>
-      <li><a href="laerm.html">Lärmmessung</a></li>
-      <li><a href="fahrzeuge.html">Fahrzeugaufkommen</a></li>
-      <li><a href="abgas.html">Abgase</a></li>
-      <li><a href="Daten&Zahlen-Bilder.html">Daten&Zahlen-Bilder</a></li>
-      <li><a href="kontakt.html">Kontakt</a></li>
-    </ul>
-  </nav>
+  <nav>
+    <h1>Nachbarschaft<br>Lärmschutz<br>Königstein/Schneidhain</h1>
+    <ul>
+      <li><a href="index.html" class="active">Startseite</a></li>
+      <li><a href="laerm.html">Lärmmessung</a></li>
+      <li><a href="fahrzeuge.html">Fahrzeugaufkommen</a></li>
+      <li><a href="abgas.html">Abgase</a></li>
+      <li><a href="Daten&Zahlen-Bilder.html">Daten&Zahlen-Bilder</a></li>
+      <li><a href="kontakt.html">Kontakt</a></li>
+    </ul>
+  </nav>
 
-  <div class="main">
-    <div class="hero fade-in">
-      <h2>Für mehr Lebensqualität in unserem Zuhause</h2>
-      <p>Wir, die Anwohnerinnen und Anwohner der Wiesbadener Straße und Bischof Kaller Straße in Königstein/Schneidhain, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung.</p>
-    </div>
+  <div class="main">
+    <div class="hero fade-in">
+      <h2>Für mehr Lebensqualität in unserem Zuhause</h2>
+      <p>Wir, die Anwohnerinnen und Anwohner der Wiesbadener Straße und Bischof Kaller Straße in Königstein/Schneidhain, fordern dringende Maßnahmen gegen die stetig zunehmende Verkehrsbelastung.</p>
+    </div>
 
-    <div class="section fade-in">
-      <h3>Die wichtigsten Probleme im Überblick</h3>
-      <ul class="problem-list">
-        <li>
-          <b>Raserei trotz 30er-Zone:</b>
-          Obwohl die 30er-Zone klar ausgeschildert ist, rasen Fahrzeuge – Tag und Nacht – mit deutlich überhöhter Geschwindigkeit durch unsere Straßen. Das erhöht nicht nur den Lärm, sondern stellt auch eine enorme Gefahr dar.
-        </li>
-        <li>
-          <b>Unerträgliche Lärmbelastung:</b>
-          Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt.
-        </li>
-        <li>
-          <b>Lüften kaum möglich:</b>
-          Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich.
-        </li>
-        <li>
-          <b>Garten nicht nutzbar:</b>
-          Unser eigener Garten kann nicht mehr als Ort der Erholung dienen. Das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Bei diesem Lärmpegel undenkbar.
-        </li>
-        <li>
-          <b>Morgendlicher Stau und Stress:</b>
-          Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung. Dies führt zu zusätzlichen Abgasen, Lärm und unnötigem Stress für alle.
-        </li>
-        <li>
-          <b>Massive gesundheitliche Belastung:</b>
-          Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aus – besonders auf Kinder und ältere Menschen.
-        </li>
-      </ul>
-    </div>
-
-    <div class="section fade-in">
-      <h3>Gefahr für Fußgänger – besonders für Kinder und Senioren</h3>
-      <p>Unsere Straßen sind für Fußgänger ein gefährliches Pflaster:</p>
-      <ul class="danger-list">
-        <li>
-          <b>Fehlende sichere Überquerungsmöglichkeiten:</b>
-          Es gibt keinen Zebrastreifen oder sichere Querungsstellen – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand.
-        </li>
-        <li>
-          <b>Mangelnde Verkehrsinfrastruktur:</b>
-          An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine, was die sichere Querung der Straße zusätzlich erschwert.
-        </li>
-        <li>
-          <b>Gefahr für Radfahrer:</b>
-          Auch Fahrradfahrer sind gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind und sie sich den beengten Raum mit schnellfahrenden Fahrzeugen teilen müssen.
-        </li>
-      </ul>
-    </div>
-
-    <div class="section fade-in">
-      <h3>Weitere Mängel</h3>
-      <ul class="defect-list">
-        <li>
-          <b>Zahlreiche Schlaglöcher:</b>
-          Diese führen nicht nur zu zusätzlichen Lärmemissionen durch LKWs und Transporter, sondern erhöhen auch den Verschleiß an Fahrzeugen und stellen eine Gefahr für Zweiradfahrer dar.
-        </li>
-        <li>
-          <b>Unzureichende Verkehrsüberwachung:</b>
-          Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können. Eine konsequente Überwachung fehlt gänzlich.
-        </li>
-      </ul>
-    </div>
-
-    <div class="section fade-in">
-      <h3>Unsere dringenden Forderungen</h3>
-      <p>Wir fordern konkrete und sofortige Maßnahmen zur Verbesserung unserer Situation:</p>
-      <ul class="demand-list">
-       <li>
-         <b>Installation fester Blitzer und Gehwegoptimierung:</b>
-          Für mehr Sicherheit und Fußgängerfreundlichkeit fordern wir Hessen Mobil auf, im Zuge der Straßensanierung beidseitig feste Blitzer zu installieren und die Gehwege zu verbreitern und zu optimieren.
+    <div class="section fade-in">
+      <h3>Die wichtigsten Probleme im Überblick</h3>
+      <ul class="problem-list">
+        <li>
+          <b>Raserei trotz 30er-Zone:</b>
+          Obwohl die 30er-Zone klar ausgeschildert ist, rasen Fahrzeuge – Tag und Nacht – mit deutlich überhöhter Geschwindigkeit durch unsere Straßen. Das erhöht nicht nur den Lärm, sondern stellt auch eine enorme Gefahr dar.
         </li>
-        <li>
-          <b>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen:</b>
-          Nur eine konsequente Überwachung kann die Einhaltung der Geschwindigkeitsbegrenzung in der 30er-Zone gewährleisten.
-        </li>
-        <li>
-          <b>Bauliche Verkehrsberuhigung:</b>
-          Wir benötigen effektive bauliche Maßnahmen wie Fahrbahnverengungen, Bodenschwellen oder strategisch platzierte Blumenkübel, um den Verkehr nachhaltig zu verlangsamen.
-        </li>
-        <li>
-          <b>Einrichtung eines Zebrastreifens oder einer Ampel:</b>
-          Um die Sicherheit von Fußgängern, insbesondere von Kindern und Senioren, zu gewährleisten.
-        </li>
-        <li>
-          <b>Umfassende Sanierung der Straßendecke:</b>
-          Eine Erneuerung der Fahrbahn ist dringend notwendig, um den Lärmpegel deutlich zu reduzieren.
-        </li>
-        <li>
-          <b>Regelmäßige Luft- und Lärmmessungen:</b>
-          Transparenz ist entscheidend. Wir wollen wissen, wie stark die Belastung tatsächlich ist und ob unsere Forderungen Wirkung zeigen.
-        </li>
-        <li>
-          <b>Bürgerbeteiligung zur Verkehrsplanung:</b>
-          Wir fordern eine aktive Einbindung der Anwohner in die Entwicklung nachhaltiger Verkehrskonzepte für unser Wohngebiet.
-        </li>
-        <li>
-          <b>LKW-Durchfahrtsverbot oder Maut:</b>
-          Ein generelles LKW-Durchfahrtsverbot oder die Einführung einer Maut für Fahrzeuge, die unsere Straße als Abkürzung nutzen, ist unerlässlich.
-        </li>
-      </ul>
-    </div>
+        <li>
+          <b>Unerträgliche Lärmbelastung:</b>
+          Ob motorisierte Zweiräder, PKWs oder LKWs – der Lärmpegel hat ein gesundes Maß längst überschritten. Besonders belastend ist das tieffrequente Dröhnen der LKWs, das beim Vorbeifahren das Mauerwerk zum Vibrieren bringt.
+        </li>
+        <li>
+          <b>Lüften kaum möglich:</b>
+          Das Öffnen der Fenster ist aufgrund des kontinuierlichen Lärms und der beißenden Abgase kaum noch zumutbar. Eine natürliche Durchlüftung der Wohnung ist schlichtweg nicht mehr möglich.
+        </li>
+        <li>
+          <b>Garten nicht nutzbar:</b>
+          Unser eigener Garten kann nicht mehr als Ort der Erholung dienen. Das Verweilen im Freien ist unmöglich geworden. Gespräche, Ruhepausen oder Spielen mit Kindern? Bei diesem Lärmpegel undenkbar.
+        </li>
+        <li>
+          <b>Morgendlicher Stau und Stress:</b>
+          Jeden Morgen staut sich der Verkehr bereits früh – insbesondere durch Durchgangsverkehr und fehlende Verkehrslenkung. Dies führt zu zusätzlichen Abgasen, Lärm und unnötigem Stress für alle.
+        </li>
+        <li>
+          <b>Massive gesundheitliche Belastung:</b>
+          Die Feinstaubbelastung und der kontinuierliche Stress durch Lärm wirken sich nachweislich negativ auf die körperliche und psychische Gesundheit aus – besonders auf Kinder und ältere Menschen.
+        </li>
+      </ul>
+    </div>
 
-    <div class="petition-container fade-in">
-      <h3>Wir brauchen Ihre Unterstützung!</h3>
-      <p>Lassen Sie uns gemeinsam für mehr Lebensqualität, Sicherheit und Gesundheit in der Wiesbadener Straße und Bischof Kaller Straße kämpfen!</p>
-      <a href="https://www.openpetition.de/petition/online/petition-sofortiger-schutz-vor-verkehrs-laerm-und-abgas-belastung-auf-der-wiesbadener-strasse-und-bi" class="petition-link" target="_blank">
-        Zur Online-Petition
-      </a>
-    </div>
-  </div>
+    <div class="section fade-in">
+      <h3>Gefahr für Fußgänger – besonders für Kinder und Senioren</h3>
+      <p>Unsere Straßen sind für Fußgänger ein gefährliches Pflaster:</p>
+      <ul class="danger-list">
+        <li>
+          <b>Fehlende sichere Überquerungsmöglichkeiten:</b>
+          Es gibt keinen Zebrastreifen oder sichere Querungsstellen – gerade für Kinder auf dem Schulweg oder ältere Anwohner ein unhaltbarer Zustand.
+        </li>
+        <li>
+          <b>Mangelnde Verkehrsinfrastruktur:</b>
+          An vielen Stellen fehlen Verkehrsinseln, Ampeln oder abgesenkte Bordsteine, was die sichere Querung der Straße zusätzlich erschwert.
+        </li>
+        <li>
+          <b>Gefahr für Radfahrer:</b>
+          Auch Fahrradfahrer sind gefährdet, da keine ausgewiesenen Schutzstreifen vorhanden sind und sie sich den beengten Raum mit schnellfahrenden Fahrzeugen teilen müssen.
+        </li>
+      </ul>
+    </div>
+
+    <div class="section fade-in">
+      <h3>Weitere Mängel</h3>
+      <ul class="defect-list">
+        <li>
+          <b>Zahlreiche Schlaglöcher:</b>
+          Diese führen nicht nur zu zusätzlichen Lärmemissionen durch LKWs und Transporter, sondern erhöhen auch den Verschleiß an Fahrzeugen und stellen eine Gefahr für Zweiradfahrer dar.
+        </li>
+        <li>
+          <b>Unzureichende Verkehrsüberwachung:</b>
+          Die wenigen Kontrollen führen dazu, dass sich viele Verkehrsteilnehmer ungestört über Regeln hinwegsetzen können. Eine konsequente Überwachung fehlt gänzlich.
+        </li>
+      </ul>
+    </div>
+
+    <div class="section fade-in">
+      <h3>Unsere dringenden Forderungen</h3>
+      <p>Wir fordern konkrete und sofortige Maßnahmen zur Verbesserung unserer Situation:</p>
+      <ul class="demand-list">
+        <li>
+          <b>Verstärkte Verkehrsüberwachung und regelmäßige Radarkontrollen:</b>
+          Nur eine konsequente Überwachung kann die Einhaltung der Geschwindigkeitsbegrenzung in der 30er-Zone gewährleisten.
+        </li>
+        <li>
+          <b>Bauliche Verkehrsberuhigung:</b>
+          Wir benötigen effektive bauliche Maßnahmen wie Fahrbahnverengungen, Bodenschwellen oder strategisch platzierte Blumenkübel, um den Verkehr nachhaltig zu verlangsamen.
+        </li>
+        <li>
+          <b>Einrichtung eines Zebrastreifens oder einer Ampel:</b>
+          Um die Sicherheit von Fußgängern, insbesondere von Kindern und Senioren, zu gewährleisten.
+        </li>
+        <li>
+          <b>Umfassende Sanierung der Straßendecke:</b>
+          Eine Erneuerung der Fahrbahn ist dringend notwendig, um den Lärmpegel deutlich zu reduzieren.
+        </li>
+        <li>
+          <b>Regelmäßige Luft- und Lärmmessungen:</b>
+          Transparenz ist entscheidend. Wir wollen wissen, wie stark die Belastung tatsächlich ist und ob unsere Forderungen Wirkung zeigen.
+        </li>
+        <li>
+          <b>Bürgerbeteiligung zur Verkehrsplanung:</b>
+          Wir fordern eine aktive Einbindung der Anwohner in die Entwicklung nachhaltiger Verkehrskonzepte für unser Wohngebiet.
+        </li>
+        <li>
+          <b>LKW-Durchfahrtsverbot oder Maut:</b>
+          Ein generelles LKW-Durchfahrtsverbot oder die Einführung einer Maut für Fahrzeuge, die unsere Straße als Abkürzung nutzen, ist unerlässlich.
+        </li>
+      </ul>
+    </div>
+
+    <div class="petition-container fade-in">
+      <h3>Wir brauchen Ihre Unterstützung!</h3>
+      <p>Lassen Sie uns gemeinsam für mehr Lebensqualität, Sicherheit und Gesundheit in der Wiesbadener Straße und Bischof Kaller Straße kämpfen!</p>
+      <a href="https://www.openpetition.de/petition/online/petition-sofortiger-schutz-vor-verkehrs-laerm-und-abgas-belastung-auf-der-wiesbadener-strasse-und-bi" class="petition-link" target="_blank">
+        Zur Online-Petition
+      </a>
+    </div>
+  </div>
 </div>
 
 <script>
-  // Scroll animation
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-  };
+  // Scroll animation
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  });
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
 
-  document.querySelectorAll('.fade-in').forEach(element => {
-    observer.observe(element);
-  });
+  // Observe all fade-in elements
+  document.querySelectorAll('.fade-in').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Add some initial delay for hero
+  setTimeout(() => {
+    document.querySelector('.hero').classList.add('visible');
+  }, 200);
 </script>
 </body>
 </html>
