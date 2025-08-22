@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Lärmpegel-Auswertung</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -71,46 +71,50 @@
             canvas { height: 250px !important; }
         }
     </style>
-</head>
-<body>
-<nav class="top-nav">
-    <a href="index.html">Start</a>
-    <a href="laerm.html" class="active">Lärmpegel</a>
-    <a href="abgas.html">Abgas</a>
-    <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
-    <a href="Daten&Zahlen-Bilder.html">Daten&Zahlen-Bilder</a>
-    <a href="kontakt.html">Kontakt</a>
-</nav>
-<div id="container">
-    <h1>Lärmpegel</h1>
-    <div class="chart-block">
+  </head>
+  <body>
+    <nav class="top-nav"> <a href="index.html">Start</a> <a href="laerm.html"
+
+        class="active">Lärmpegel</a> <a href="abgas.html">Abgas</a> <a href="fahrzeuge.html">Fahrzeugaufkommen</a>
+      <a href="Daten&amp;Zahlen-Bilder.html">Daten&amp;Zahlen-Bilder</a> <a href="kontakt.html">Kontakt</a>
+    </nav>
+    <div id="container">
+      <h1><span>„Aktuell </span><span>werden </span><span>keine </span><span>Messungen
+          </span><span>durchgeführt.“</span></h1>
+      <h1>Lärmpegel</h1>
+      <div class="chart-block">
         <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
-        <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
-        <canvas id="laermpegel-live"></canvas>
-    </div>
-    <div class="chart-block">
+        <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB
+          (gesundheitsschädlich)</p>
+        <canvas id="laermpegel-live"></canvas> </div>
+      <div class="chart-block">
+        <h2 style="text-align: left; background-color: #ff6666;"><strong>„<em>Im
+              Zeitraum vom 02.07.2025 um 00:00 Uhr bis zum 11.07.2025 wurden
+              Lärmmessungen durchgeführt.</em></strong><em>&nbsp;<strong></strong></em></h2>
+        <h2 style="background-color: #ff6666;"><em><strong>Um die Messwerte
+              einzusehen, wählen Sie bitte einen Zeitabschnitt innerhalb des
+              genannten Zeitraums – idealerweise tage- oder stundenweise.“</strong></em><br>
+          <span></span></h2>
         <h2>Historische Lärmpegel-Auswertung</h2>
-        <div class="input-row">
-            <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
-            <select id="zeitraum-select" onchange="setZeitraumSelect()">
-                <option value="10">letzte 10 Minuten</option>
-                <option value="30">letzte 30 Minuten</option>
-                <option value="60">letzte 1 Stunde</option>
-                <option value="360">letzte 6 Stunden</option>
-                <option value="720">letzte 12 Stunden</option>
-                <option value="1440">letzte 24 Stunden</option>
-            </select>
-            <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
-            <label for="von">von:</label>
-            <input type="datetime-local" id="von" style="margin-right:8px;">
-            <label for="bis">bis:</label>
-            <input type="datetime-local" id="bis" style="margin-right:8px;">
-            <button onclick="zeitraumVonBis()">Anwenden</button>
+        <div class="input-row"> <label for="zeitraum-select" style="margin-right:8px;">Zeitraum:</label>
+          <select id="zeitraum-select" onchange="setZeitraumSelect()">
+            <option value="10">letzte 10 Minuten</option>
+            <option value="30">letzte 30 Minuten</option>
+            <option value="60">letzte 1 Stunde</option>
+            <option value="360">letzte 6 Stunden</option>
+            <option value="720">letzte 12 Stunden</option>
+            <option value="1440">letzte 24 Stunden</option>
+          </select>
+          <span style="margin-left:24px; margin-right:8px;">oder Zeitraum:</span>
+          <label for="von">von:</label> <input id="von" style="margin-right:8px;"
+
+            type="datetime-local"> <label for="bis">bis:</label> <input id="bis"
+
+            style="margin-right:8px;" type="datetime-local"> <button onclick="zeitraumVonBis()">Anwenden</button>
         </div>
-        <canvas id="laermpegel-historic"></canvas>
+        <canvas id="laermpegel-historic"></canvas> </div>
     </div>
-</div>
-<script>
+    <script>
 // Chart.js Plugin für farbige Schwellenbereiche
 const backgroundRangesPlugin = {
     id: 'backgroundRanges',
@@ -388,5 +392,5 @@ document.getElementById('bis').addEventListener('change', () => {});
 setInterval(ladePegelDaten, 5 * 60 * 1000);
 ladePegelDaten();
 </script>
-</body>
+  </body>
 </html>
