@@ -11,75 +11,64 @@
             margin: 0;
         }
 
-        /* Styles für die obere Navigation */
         .top-nav {
-            background: #224e7a; /* Dunkelblau, passend zum ersten Beispiel */
+            background: #224e7a;
             color: #fff;
-            padding: 10px 0; /* Padding angepasst für die Höhe */
+            padding: 10px 0;
             display: flex;
-            justify-content: center; /* Zentriert die Navigationspunkte */
+            justify-content: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            width: 100%; /* Passt über die gesamte Seitenbreite */
+            width: 100%;
         }
         .top-nav a {
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            margin: 0 20px; /* Abstand zwischen den Navigationspunkten */
+            margin: 0 20px;
             font-size: 1.13em;
             padding: 8px 15px;
             border-radius: 4px;
             transition: background 0.2s;
-            display: inline-block; /* Für korrekten Abstand und Padding */
+            display: inline-block;
         }
         .top-nav a.active, .top-nav a:hover {
-            background: #163c5a; /* Etwas dunkler für Hover/Active */
+            background: #163c5a;
             text-decoration: underline;
         }
-
-        /* Hauptcontainer unterhalb der Navigation */
         #container {
-            max-width: 1400px; /* Angepasst an das erste Beispiel */
+            max-width: 1400px;
             margin: 40px auto;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 8px #ccc;
-            padding: 30px 40px; /* Padding wie im ersten Beispiel main-content */
+            padding: 30px 40px;
         }
-        
-        /* Die .main-layout Klasse ist nicht mehr notwendig, da #container direkt der Hauptinhalt ist */
-        /* .main-layout { display: flex; flex-direction: column; min-height: 100vh; } */
-
-
         .chart-block { margin-bottom: 55px; }
         .input-row { margin-bottom: 18px; display: flex; align-items: center; flex-wrap: wrap;}
         .input-row label { margin-right: 8px; }
-        
         canvas {
             width: 100% !important;
-            max-width: 1100px; /* Angepasst an das erste Beispiel chart-wrapper max-width */
-            height: 560px !important; /* Angepasst an das erste Beispiel canvas height */
-            min-height: 320px; /* Behalten, da es eine sinnvolle Untergrenze ist */
+            max-width: 1100px;
+            height: 560px !important;
+            min-height: 320px;
             border-radius: 8px;
             background: #fafcff;
             box-shadow: 0 2px 8px #dde2ee;
             display: block;
             margin: auto;
         }
-
         @media (max-width: 1000px) {
-            .top-nav { /* Adjust top navigation for smaller screens if needed */
+            .top-nav {
                 width: 96%;
                 margin: 20px 2%;
                 justify-content: space-around;
             }
             .top-nav a { padding: 12px 18px; }
-
             #container { margin: 22px 4vw; padding: 3vw; }
             .input-row { flex-direction: column; align-items: stretch;}
         }
         @media (max-width: 600px) {
-            canvas { height: 250px !important; } /* Angepasst an das erste Beispiel */
+            canvas { height: 250px !important; }
         }
     </style>
 </head>
@@ -94,13 +83,11 @@
 </nav>
 <div id="container">
     <h1>Lärmpegel</h1>
-
     <div class="chart-block">
         <h2>Lärmpegel (Live, alle 5 Minuten aktualisiert)</h2>
         <p>WHO-Grenzwerte: 55 dB (Empfehlung), 65 dB (kritisch), 70 dB (gesundheitsschädlich)</p>
         <canvas id="laermpegel-live"></canvas>
     </div>
-
     <div class="chart-block">
         <h2>Historische Lärmpegel-Auswertung</h2>
         <div class="input-row">
@@ -123,7 +110,6 @@
         <canvas id="laermpegel-historic"></canvas>
     </div>
 </div>
-
 <script>
 // Chart.js Plugin für farbige Schwellenbereiche
 const backgroundRangesPlugin = {
@@ -155,19 +141,26 @@ let alleRawLabels = [];
 let alleRawDaten = [];
 
 async function fetchPegelDaten() {
-    const response = await fetch('Daten/pegel.txt'); // Pfad zu deiner Daten-Textdatei
-    const text = await response.text();
-    const lines = text.trim().split('\n');
-    const labels = [];
-    const daten = [];
-    lines.forEach(line => {
-        const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2} - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
-        if (match) {
-            labels.push(match[1]);
-            daten.push(parseFloat(match[2]));
-        }
-    });
-    return {labels, daten};
+    try {
+        const response = await fetch('Daten/pegel.txt'); // Pfad zu deiner Daten-Textdatei
+        if (!response.ok) throw new Error('Datei konnte nicht geladen werden: ' + response.status);
+        const text = await response.text();
+        const lines = text.trim().split('\n');
+        const labels = [];
+        const daten = [];
+        lines.forEach(line => {
+            // KORRIGIERTES REGEX: Sekundengenau
+            const match = line.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) - (?:Maximaler|Aktueller) Pegel: ([0-9.]+) dB$/);
+            if (match) {
+                labels.push(match[1]);
+                daten.push(parseFloat(match[2]));
+            }
+        });
+        return {labels, daten};
+    } catch (err) {
+        alert('Fehler beim Laden von pegel.txt:\n' + err);
+        return {labels:[], daten:[]};
+    }
 }
 
 function genGrenzwertArray(wert, len) {
@@ -264,9 +257,8 @@ async function ladePegelDaten() {
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, liveLabels.length),
-                    borderColor: '#32CD32', // Helleres Grün
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt, um durchgehende Linie zu erhalten
+                    borderColor: '#32CD32',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -274,9 +266,8 @@ async function ladePegelDaten() {
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, liveLabels.length),
-                    borderColor: '#FFD700', // Helleres Gelb/Gold
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt
+                    borderColor: '#FFD700',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -284,9 +275,8 @@ async function ladePegelDaten() {
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, liveLabels.length),
-                    borderColor: '#FF4500', // Helleres Rot/Orange
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt
+                    borderColor: '#FF4500',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -341,9 +331,8 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'WHO Empfehlung (55 dB)',
                     data: genGrenzwertArray(55, labels.length),
-                    borderColor: '#32CD32', // Helleres Grün
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt
+                    borderColor: '#32CD32',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -351,9 +340,8 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'WHO kritisch (65 dB)',
                     data: genGrenzwertArray(65, labels.length),
-                    borderColor: '#FFD700', // Helleres Gelb/Gold
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt
+                    borderColor: '#FFD700',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -361,9 +349,8 @@ function renderHistoricChart(labels, daten) {
                 {
                     label: 'WHO gesundheitsschädlich (70 dB)',
                     data: genGrenzwertArray(70, labels.length),
-                    borderColor: '#FF4500', // Helleres Rot/Orange
-                    borderWidth: 2, // Dickere Linie
-                    // borderDash: [4,4], // Entfernt
+                    borderColor: '#FF4500',
+                    borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
                     z: 1 
@@ -397,6 +384,8 @@ function renderHistoricChart(labels, daten) {
 document.getElementById('von').addEventListener('change', () => {});
 document.getElementById('bis').addEventListener('change', () => {});
 
+// Automatisches Neuladen alle 5 Minuten
+setInterval(ladePegelDaten, 5 * 60 * 1000);
 ladePegelDaten();
 </script>
 </body>
